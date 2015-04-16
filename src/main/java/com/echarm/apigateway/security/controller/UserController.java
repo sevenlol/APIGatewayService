@@ -5,6 +5,9 @@ import java.security.Principal;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.echarm.apigateway.accountsystem.model.Account;
+import com.echarm.apigateway.security.service.UserDetailsImpl;
+
 @RestController
 public class UserController {
 
@@ -15,5 +18,14 @@ public class UserController {
     @RequestMapping("/user")
     public Principal user(Principal user) {
         return user;
+    }
+
+    @RequestMapping("/user/me")
+    public Account getUserAccount(Principal user) {
+        if (user instanceof UserDetailsImpl) {
+            return ((UserDetailsImpl) user).getAccount();
+        }
+
+        return null;
     }
 }

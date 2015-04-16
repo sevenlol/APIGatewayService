@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
+import com.echarm.apigateway.security.service.UserDetailServiceImpl;
+
 @Configuration
 @EnableWebSecurity
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
@@ -44,10 +46,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
 	@Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//	    auth.userDetailsService(new UserDetailServiceImpl());
-	    auth.inMemoryAuthentication()
+	    auth.userDetailsService(new UserDetailServiceImpl());
+	    /*auth.inMemoryAuthentication()
 	            .withUser("user").password("1234").roles("USER")
 	        .and()
-	            .withUser("admin").password("12345678").roles("ADMIN");
+	            .withUser("admin").password("12345678").roles("ADMIN");*/
 	}
 }
