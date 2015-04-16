@@ -39,9 +39,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         .and()
             .authorizeRequests().antMatchers(HttpMethod.PUT, "/accounts/**").permitAll()
         .and()
-            .authorizeRequests().antMatchers(HttpMethod.PATCH, "/accounts/**").permitAll();
-//	    .and()
-//	        .authorizeRequests().antMatchers(HttpMethod.POST, "/user").permitAll();
+            .authorizeRequests().antMatchers(HttpMethod.PATCH, "/accounts/**").permitAll()
+	    .and()
+	        .authorizeRequests().antMatchers("/user/**").authenticated();
 	}
 
 	@Autowired

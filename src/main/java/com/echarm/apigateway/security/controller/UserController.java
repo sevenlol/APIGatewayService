@@ -2,6 +2,8 @@ package com.echarm.apigateway.security.controller;
 
 import java.security.Principal;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,7 +23,9 @@ public class UserController {
     }
 
     @RequestMapping("/user/me")
-    public Account getUserAccount(Principal user) {
+    public Account getUserAccount() {
+        UserDetails user = (UserDetails)SecurityContextHolder.getContext().
+                getAuthentication().getPrincipal();
         if (user instanceof UserDetailsImpl) {
             return ((UserDetailsImpl) user).getAccount();
         }
