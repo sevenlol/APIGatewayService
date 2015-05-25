@@ -9,14 +9,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.UserProfile;
 import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
@@ -34,19 +36,27 @@ public class UserController {
      * else, an 401 response is returned
      */
     @RequestMapping("/user")
-    public Principal user(Principal user) {
-        return user;
-    }
+    public Account user(Authentication auth) {
+    	if (auth == null)
+    		return null;
 
-    @RequestMapping("/user/me")
-    public Account getUserAccount() {
-        UserDetails user = (UserDetails)SecurityContextHolder.getContext().
-                getAuthentication().getPrincipal();
-        if (user instanceof UserDetailsImpl) {
-            return ((UserDetailsImpl) user).getAccount();
+    	Object user = auth.getPrincipal();
+    	if (user instanceof UserDetailsImpl) {
+        	Account account = ((UserDetailsImpl) user).getAccount();
+        	if (account != null) {
+        		account.setPassword(null);
+        		account.setSalt(null);
+        	}
+            return account;
         }
 
         return null;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    public List<Account> getUsers(@RequestParam(value = "id_list", required = false) String accountIdListStr) {
+    	// TODO finish this
+    	return null;
     }
 
     @RequestMapping("/signup")
