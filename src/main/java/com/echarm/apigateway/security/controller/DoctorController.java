@@ -3,6 +3,7 @@ package com.echarm.apigateway.security.controller;
 import java.util.List;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,7 +16,14 @@ import com.echarm.apigateway.accountsystem.model.DoctorAccount;
 public class DoctorController {
 
 	@RequestMapping(value = "/members/doctors", method = RequestMethod.GET)
-    public List<DoctorAccount> getDoctors(@RequestParam(value = "id_list", required = false) String accountIdListStr) {
+    public List<DoctorAccount> getAllDoctors(@RequestParam(value = "id_list", required = false) String accountIdListStr) {
+    	// TODO finish this
+    	return null;
+    }
+
+	@RequestMapping(value = "/members/doctors/{category}", method = RequestMethod.GET)
+    public List<DoctorAccount> getDoctorsInCategory(@RequestParam(value = "id_list", required = false) String accountIdListStr,
+    												@PathVariable String category) {
     	// TODO finish this
     	return null;
     }
@@ -29,5 +37,4 @@ public class DoctorController {
 	public DoctorAccount updateDoctor(@RequestBody(required=false) DoctorAccount account, Authentication auth) {
 		return null;
 	}
-
 }
