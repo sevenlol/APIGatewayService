@@ -113,7 +113,7 @@ public class AccountFieldChecker {
 			case email:
 				return checkFieldType(type, account.getEmail());
 			case userInfo:
-				return checkFieldType(type, account.getEmail());
+				return checkFieldType(type, account.getUserInfo());
 			default:
 		}
 
