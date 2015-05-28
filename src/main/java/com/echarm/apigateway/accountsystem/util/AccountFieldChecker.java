@@ -33,7 +33,8 @@ public class AccountFieldChecker {
 	public static enum CheckType {
 		NA,
 		NON_NULL,
-		NON_EMPTY
+		NON_EMPTY,
+		BOTH
 	};
 
 	private CheckType[] checkArray = new CheckType[CheckField.values().length];
@@ -102,6 +103,14 @@ public class AccountFieldChecker {
 					return true;
 
 				return field == null || !((String) field).equals("");
+			case BOTH:
+				if (field == null)
+					return false;
+
+				if (!(field instanceof String))
+					return true;
+
+				return !((String) field).equals("");
 			default:
 		}
 		return true;
