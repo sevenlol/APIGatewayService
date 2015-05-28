@@ -28,19 +28,28 @@ public class AccountFieldChecker {
 		public int getValue() {
 			return this.value;
 		}
-	};
+	}
 
 	public static enum CheckType {
 		NA,
 		NON_NULL,
 		NON_EMPTY,
 		BOTH
-	};
+	}
+
+	public static enum ConnectType {
+		ALL_PASS,
+		NOT_ALL_FAIL
+	}
 
 	private CheckType[] checkArray = new CheckType[CheckField.values().length];
+	private ConnectType connectType = ConnectType.ALL_PASS;
 
 
-	public AccountFieldChecker() {
+	public AccountFieldChecker(ConnectType connectType) {
+		if (connectType != null)
+			this.connectType = connectType;
+
 		for (int i = 0; i < checkArray.length; i++) {
 			checkArray[i] = CheckType.NA;
 		}
@@ -57,11 +66,28 @@ public class AccountFieldChecker {
 		if (account == null)
 			return false;
 
-		boolean result = true;
+		boolean result;
+
+		switch (connectType) {
+			case ALL_PASS:
+				result = true;
+				break;
+			case NOT_ALL_FAIL:
+				result = false;
+				break;
+			default:
+				return false;
+		}
 
 		for (CheckField c : CheckField.values()) {
-			if (checkArray[c.getValue()] != CheckType.NA) {
+			if (checkArray[c.getValue()] == CheckType.NA)
+				continue;
+
+			if (connectType == ConnectType.ALL_PASS) {
 				result = result && checkAccountField(c, checkArray[c.getValue()], account);
+			} else if (connectType == ConnectType.NOT_ALL_FAIL) {
+				if (checkAccountField(c, checkArray[c.getValue()], account))
+					return true;
 			}
 		}
 
