@@ -10,21 +10,38 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.echarm.apigateway.accountsystem.error.InvalidParameterException;
 import com.echarm.apigateway.accountsystem.model.DoctorAccount;
+import com.echarm.apigateway.accountsystem.util.Category;
+import com.echarm.apigateway.security.util.CommaDelimitedStringParser;
 
 @RestController
 public class DoctorController {
 
 	@RequestMapping(value = "/members/doctors", method = RequestMethod.GET)
-    public List<DoctorAccount> getAllDoctors(@RequestParam(value = "id_list", required = false) String accountIdListStr) {
-    	// TODO finish this
+    public List<DoctorAccount> getAllDoctors(@RequestParam(value = "id_list", required = false) String accountIdListStr) throws InvalidParameterException {
+		if (accountIdListStr != null) {
+			// not null => parse str
+			String[] accountIdList = CommaDelimitedStringParser.parse(accountIdListStr);
+			// TODO get user list here
+		}
     	return null;
     }
 
-	@RequestMapping(value = "/members/doctors/{category}", method = RequestMethod.GET)
+	@RequestMapping(value = "/members/doctors/{categoryStr}", method = RequestMethod.GET)
     public List<DoctorAccount> getDoctorsInCategory(@RequestParam(value = "id_list", required = false) String accountIdListStr,
-    												@PathVariable String category) {
-    	// TODO finish this
+    												@PathVariable String categoryStr) throws InvalidParameterException {
+		Category category = null;
+
+		if (categoryStr != null) {
+			category = Category.isCategoryExist(categoryStr);
+		}
+
+		if (accountIdListStr != null) {
+			// not null => parse str
+			String[] accountIdList = CommaDelimitedStringParser.parse(accountIdListStr);
+			// TODO get user list here
+		}
     	return null;
     }
 
