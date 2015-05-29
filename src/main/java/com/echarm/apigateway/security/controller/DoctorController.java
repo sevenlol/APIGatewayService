@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.echarm.apigateway.accountsystem.error.InvalidParameterException;
+import com.echarm.apigateway.accountsystem.error.MissingParameterErrorBody;
 import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.accountsystem.model.Account;
 import com.echarm.apigateway.accountsystem.model.DoctorAccount;
@@ -20,6 +21,7 @@ import com.echarm.apigateway.accountsystem.repository.AccountRepositoryService;
 import com.echarm.apigateway.accountsystem.util.AccountFieldChecker;
 import com.echarm.apigateway.accountsystem.util.Category;
 import com.echarm.apigateway.accountsystem.util.DoctorInfoFieldChecker;
+import com.echarm.apigateway.accountsystem.util.UserType;
 import com.echarm.apigateway.security.service.UserDetailsImpl;
 import com.echarm.apigateway.security.util.CommaDelimitedStringParser;
 
@@ -57,7 +59,7 @@ public class DoctorController {
     }
 
 	@RequestMapping(value = "/members/doctors", method = RequestMethod.POST)
-	public DoctorAccount registerDoctor(@RequestBody(required=false) DoctorAccount account) {
+	public DoctorAccount registerDoctor(@RequestBody(required=false) DoctorAccount account) throws InvalidParameterException {
 
 		// Check Input Account
 		AccountFieldChecker accountChecker = new AccountFieldChecker(AccountFieldChecker.ConnectType.ALL_PASS);
@@ -65,7 +67,11 @@ public class DoctorController {
 			.setChecker(AccountFieldChecker.CheckField.email, AccountFieldChecker.CheckType.BOTH)
 			.setChecker(AccountFieldChecker.CheckField.userInfo, AccountFieldChecker.CheckType.NON_NULL);
 		if (!accountChecker.check(account)) {
-			// TODO check type fail, throw error
+			// check type fail, throw error
+			MissingParameterErrorBody body = new MissingParameterErrorBody(MissingParameterErrorBody.generateDescription("String: email or Object user_info", "Body"));
+            InvalidParameterException exception = new InvalidParameterException("Invalid JSON Body: email or user_info field missing!");
+            exception.setErrorBody(body);
+            throw exception;
 		}
 
 		// if userInfo is attached, check fields
@@ -88,7 +94,10 @@ public class DoctorController {
 				.setChecker(DoctorInfoFieldChecker.CheckField.blogUrl, DoctorInfoFieldChecker.CheckType.NON_EMPTY);
 
 			if(!infoChecker.check(info)) {
-				// doctor info check failed, throw error
+				MissingParameterErrorBody body = new MissingParameterErrorBody(MissingParameterErrorBody.generateDescription("Some Fields missing", "user_info in Body"));
+	            InvalidParameterException exception = new InvalidParameterException("Some fields in user_info in JSON body missing!");
+	            exception.setErrorBody(body);
+	            throw exception;
 			}
 		}
 
@@ -101,27 +110,34 @@ public class DoctorController {
 	public Account updateDoctor(@RequestBody(required=false) DoctorAccount account, Authentication auth) throws Exception {
 
 		if (auth == null) {
-			// TODO throw error
+			throw new ServerSideProblemException("Authentication Object is NULL!");
 		}
 
 		Object user = auth.getPrincipal();
 		if (!(user instanceof UserDetailsImpl)) {
-			// TODO throw error
+			throw new ServerSideProblemException("Principal Object has a wrong type!");
 		}
 
 		Account authAccount = ((UserDetailsImpl) user).getAccount();
 		if (authAccount == null) {
-			// TODO throw error
+			throw new ServerSideProblemException("Account Object in Principal is NULL!");
 		}
 
-		// TODO check userType
+		// check userType
+		if (authAccount.getUserType() == null || authAccount.getUserType() != UserType.DOCTOR) {
+			throw new ServerSideProblemException("UserType should be DOCTOR!");
+		}
 
 		// Check Input Account
 		AccountFieldChecker accountChecker = new AccountFieldChecker(AccountFieldChecker.ConnectType.NOT_ALL_FAIL);
 		accountChecker
 			.setChecker(AccountFieldChecker.CheckField.userInfo, AccountFieldChecker.CheckType.NON_NULL);
 		if (!accountChecker.check(account)) {
-			// TODO check type fail, throw error
+			// check type fail, throw error
+			MissingParameterErrorBody body = new MissingParameterErrorBody(MissingParameterErrorBody.generateDescription("Object: user_info", "Body"));
+            InvalidParameterException exception = new InvalidParameterException("Invalid JSON Body: user_info field missing!");
+            exception.setErrorBody(body);
+            throw exception;
 		}
 
 		// if userInfo is attached, check fields
@@ -145,14 +161,19 @@ public class DoctorController {
 
 			if(!infoChecker.check(info)) {
 				// doctor info check failed, throw error
+				MissingParameterErrorBody body = new MissingParameterErrorBody(MissingParameterErrorBody.generateDescription("Some Fields missing", "user_info in Body"));
+	            InvalidParameterException exception = new InvalidParameterException("Some fields in user_info in JSON body missing!");
+	            exception.setErrorBody(body);
+	            throw exception;
 			}
 		}
 
 		// set un-updateable fields to null
 		nullifyStaticAccountField(account);
 
-		// set account id
+		// set account id and category
 		account.setAccountId(authAccount.getAccountId());
+		account.getUserInfo().setCategory(((DoctorAccount)authAccount).getUserInfo().getCategory());
 
 		// update my account
 		Account result = repository.updateAccount(account);
