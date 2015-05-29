@@ -17,6 +17,7 @@ import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.accountsystem.model.Account;
 import com.echarm.apigateway.accountsystem.model.DoctorAccount;
 import com.echarm.apigateway.accountsystem.model.DoctorInfo;
+import com.echarm.apigateway.accountsystem.model.UserInfo;
 import com.echarm.apigateway.accountsystem.repository.AccountRepositoryService;
 import com.echarm.apigateway.accountsystem.util.AccountFieldChecker;
 import com.echarm.apigateway.accountsystem.util.Category;
@@ -173,14 +174,22 @@ public class DoctorController {
 
 		// set account id and category
 		account.setAccountId(authAccount.getAccountId());
-		account.getUserInfo().setCategory(((DoctorAccount)authAccount).getUserInfo().getCategory());
+		UserInfo accountInfo = authAccount.getUserInfo();
+		if (!(accountInfo instanceof DoctorInfo)) {
+			throw new ServerSideProblemException("The userInfo in authAccount should be a DoctorInfo");
+		}
+		account.getUserInfo().setCategory(((DoctorInfo)accountInfo).getCategory());
 
 		// update my account
 		Account result = repository.updateAccount(account);
 
 		// type not correct, server error
-		if (!(result instanceof DoctorAccount)) {
+		// TODO Change findAllTypedAccountSpec to generate DoctorAccount Object instead of Account
+		/*if (!(result instanceof DoctorAccount)) {
 			throw new ServerSideProblemException("The result from repository should be a DoctorAccount object");
+		}*/
+		if (result.getUserType() != UserType.DOCTOR) {
+			throw new ServerSideProblemException("The result from repository should have userType DOCTOR");
 		}
 
 		// TODO account fields check

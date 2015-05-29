@@ -107,9 +107,13 @@ public class UserController {
 		Account result = repository.updateAccount(account);
 
 		// type not correct, server error
-        if (!(result instanceof UserAccount)) {
+		// TODO Change findAllTypedAccountSpec to generate UserAccount Object instead of Account
+        /*if (!(result instanceof UserAccount)) {
             throw new ServerSideProblemException("The result from repository should be a UserAccount object");
-        }
+        }*/
+		if (result.getUserType() != UserType.USER) {
+			throw new ServerSideProblemException("The result from repository should have userType USER");
+		}
 
         // TODO account fields check
 
