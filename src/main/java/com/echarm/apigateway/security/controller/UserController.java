@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.echarm.apigateway.accountsystem.error.InvalidParameterException;
 import com.echarm.apigateway.accountsystem.model.Account;
 import com.echarm.apigateway.accountsystem.model.UserAccount;
+import com.echarm.apigateway.accountsystem.model.UserInfo;
 import com.echarm.apigateway.accountsystem.util.AccountFieldChecker;
+import com.echarm.apigateway.accountsystem.util.UserInfoFieldChecker;
 import com.echarm.apigateway.security.service.UserDetailsImpl;
 import com.echarm.apigateway.security.util.CommaDelimitedStringParser;
 
@@ -50,13 +52,28 @@ public class UserController {
 			// TODO throw error
 		}
 
-		// TODO Check Input Account
-		AccountFieldChecker checker = new AccountFieldChecker(AccountFieldChecker.ConnectType.NOT_ALL_FAIL);
-		checker
+		// Check Input Account
+		AccountFieldChecker accountChecker = new AccountFieldChecker(AccountFieldChecker.ConnectType.NOT_ALL_FAIL);
+		accountChecker
 			.setChecker(AccountFieldChecker.CheckField.email, AccountFieldChecker.CheckType.BOTH)
 			.setChecker(AccountFieldChecker.CheckField.userInfo, AccountFieldChecker.CheckType.NON_NULL);
-		if (!checker.check(account)) {
+		if (!accountChecker.check(account)) {
 			// TODO check type fail, throw error
+		}
+
+		UserInfo info = account.getUserInfo();
+		if (info != null) {
+			// Check UserInfo
+			UserInfoFieldChecker infoChecker = new UserInfoFieldChecker(UserInfoFieldChecker.ConnectType.NOT_ALL_FAIL);
+			infoChecker
+				.setChecker(UserInfoFieldChecker.CheckField.name, UserInfoFieldChecker.CheckType.BOTH)
+				.setChecker(UserInfoFieldChecker.CheckField.gender, UserInfoFieldChecker.CheckType.NON_NULL)
+				.setChecker(UserInfoFieldChecker.CheckField.phoneNumber, UserInfoFieldChecker.CheckType.BOTH)
+				.setChecker(UserInfoFieldChecker.CheckField.address, UserInfoFieldChecker.CheckType.BOTH);
+
+			if(!infoChecker.check(info)) {
+				// user info check failed, throw error
+			}
 		}
 
 		// TODO set un-updateable fields to null
