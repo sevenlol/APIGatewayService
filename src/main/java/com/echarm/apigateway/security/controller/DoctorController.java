@@ -2,6 +2,7 @@ package com.echarm.apigateway.security.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,9 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.echarm.apigateway.accountsystem.error.InvalidParameterException;
+import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.accountsystem.model.Account;
 import com.echarm.apigateway.accountsystem.model.DoctorAccount;
 import com.echarm.apigateway.accountsystem.model.DoctorInfo;
+import com.echarm.apigateway.accountsystem.repository.AccountRepositoryService;
 import com.echarm.apigateway.accountsystem.util.AccountFieldChecker;
 import com.echarm.apigateway.accountsystem.util.Category;
 import com.echarm.apigateway.accountsystem.util.DoctorInfoFieldChecker;
@@ -22,6 +25,9 @@ import com.echarm.apigateway.security.util.CommaDelimitedStringParser;
 
 @RestController
 public class DoctorController {
+
+	@Autowired
+    private AccountRepositoryService repository;
 
 	@RequestMapping(value = "/members/doctors", method = RequestMethod.GET)
     public List<DoctorAccount> getAllDoctors(@RequestParam(value = "id_list", required = false) String accountIdListStr) throws InvalidParameterException {
@@ -92,7 +98,7 @@ public class DoctorController {
 	}
 
 	@RequestMapping(value = "/members/doctors", method = RequestMethod.PUT)
-	public DoctorAccount updateDoctor(@RequestBody(required=false) DoctorAccount account, Authentication auth) {
+	public Account updateDoctor(@RequestBody(required=false) DoctorAccount account, Authentication auth) throws Exception {
 
 		if (auth == null) {
 			// TODO throw error
@@ -142,10 +148,35 @@ public class DoctorController {
 			}
 		}
 
-		// TODO set un-updateable fields to null
+		// set un-updateable fields to null
+		nullifyStaticAccountField(account);
 
-		// TODO update my account
+		// set account id
+		account.setAccountId(authAccount.getAccountId());
 
-		return null;
+		// update my account
+		Account result = repository.updateAccount(account);
+
+		// type not correct, server error
+		if (!(result instanceof DoctorAccount)) {
+			throw new ServerSideProblemException("The result from repository should be a DoctorAccount object");
+		}
+
+		// TODO account fields check
+
+		return result;
+	}
+
+	private void nullifyStaticAccountField(Account account) {
+		if (account == null)
+			return;
+
+		account.setAccountType(null);
+		account.setCreatedAt(null);
+		account.setEmail(null);
+		account.setPassword(null);
+		account.setSalt(null);
+		account.setUserType(null);
+		account.setUserName(null);
 	}
 }
