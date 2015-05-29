@@ -61,6 +61,7 @@ public class UserController {
 			// TODO check type fail, throw error
 		}
 
+		// if userInfo is attached, check fields
 		UserInfo info = account.getUserInfo();
 		if (info != null) {
 			// Check UserInfo
