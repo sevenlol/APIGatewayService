@@ -52,10 +52,11 @@ public class UserController {
 			// TODO throw error
 		}
 
+		// TODO check userType
+
 		// Check Input Account
 		AccountFieldChecker accountChecker = new AccountFieldChecker(AccountFieldChecker.ConnectType.NOT_ALL_FAIL);
 		accountChecker
-			.setChecker(AccountFieldChecker.CheckField.email, AccountFieldChecker.CheckType.BOTH)
 			.setChecker(AccountFieldChecker.CheckField.userInfo, AccountFieldChecker.CheckType.NON_NULL);
 		if (!accountChecker.check(account)) {
 			// TODO check type fail, throw error
