@@ -192,6 +192,10 @@ public class DoctorController {
 			throw new ServerSideProblemException("The result from repository should have userType DOCTOR");
 		}
 
+		// set password/salt to null
+		result.setPassword(null);
+		result.setSalt(null);
+
 		// TODO account fields check
 
 		return result;

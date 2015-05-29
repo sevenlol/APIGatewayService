@@ -115,6 +115,10 @@ public class UserController {
 			throw new ServerSideProblemException("The result from repository should have userType USER");
 		}
 
+		// set password/salt to null
+		result.setPassword(null);
+		result.setSalt(null);
+
         // TODO account fields check
 
 		return result;
