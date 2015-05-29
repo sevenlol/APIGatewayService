@@ -2,6 +2,7 @@ package com.echarm.apigateway.security.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,9 +11,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.echarm.apigateway.accountsystem.error.InvalidParameterException;
+import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.accountsystem.model.Account;
 import com.echarm.apigateway.accountsystem.model.UserAccount;
 import com.echarm.apigateway.accountsystem.model.UserInfo;
+import com.echarm.apigateway.accountsystem.repository.AccountRepositoryService;
 import com.echarm.apigateway.accountsystem.util.AccountFieldChecker;
 import com.echarm.apigateway.accountsystem.util.UserInfoFieldChecker;
 import com.echarm.apigateway.security.service.UserDetailsImpl;
@@ -20,6 +23,9 @@ import com.echarm.apigateway.security.util.CommaDelimitedStringParser;
 
 @RestController
 public class UserController {
+
+	@Autowired
+    private AccountRepositoryService repository;
 
 	@RequestMapping(value = "/members/users", method = RequestMethod.GET)
     public List<UserAccount> getUsers(@RequestParam(value = "id_list", required = false) String accountIdListStr) throws InvalidParameterException {
@@ -36,7 +42,7 @@ public class UserController {
     }
 
 	@RequestMapping(value = "/members/users", method = RequestMethod.PUT)
-	public UserAccount updateUser(@RequestBody(required=false) UserAccount account, Authentication auth) {
+	public Account updateUser(@RequestBody(required=false) UserAccount account, Authentication auth) throws Exception {
 
 		if (auth == null) {
 			// TODO throw error
@@ -78,10 +84,35 @@ public class UserController {
 			}
 		}
 
-		// TODO set un-updateable fields to null
+		// set un-updateable fields to null
+		nullifyStaticAccountField(account);
 
-		// TODO update my account
+		// set account id
+		account.setAccountId(authAccount.getAccountId());
 
-		return null;
+		// update my account
+		Account result = repository.updateAccount(account);
+
+		// type not correct, server error
+        if (!(result instanceof UserAccount)) {
+            throw new ServerSideProblemException("The result from repository should be a UserAccount object");
+        }
+
+        // TODO account fields check
+
+		return result;
+	}
+
+	private void nullifyStaticAccountField(Account account) {
+		if (account == null)
+			return;
+
+		account.setAccountType(null);
+		account.setCreatedAt(null);
+		account.setEmail(null);
+		account.setPassword(null);
+		account.setSalt(null);
+		account.setUserType(null);
+		account.setUserName(null);
 	}
 }
