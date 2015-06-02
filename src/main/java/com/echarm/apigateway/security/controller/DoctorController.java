@@ -153,7 +153,7 @@ public class DoctorController {
 				.setChecker(DoctorInfoFieldChecker.CheckField.address, DoctorInfoFieldChecker.CheckType.BOTH)
 				.setChecker(DoctorInfoFieldChecker.CheckField.category, DoctorInfoFieldChecker.CheckType.NON_NULL)
 				.setChecker(DoctorInfoFieldChecker.CheckField.currentHospital, DoctorInfoFieldChecker.CheckType.BOTH)
-				.setChecker(DoctorInfoFieldChecker.CheckField.college, DoctorInfoFieldChecker.CheckType.BOTH)
+				//.setChecker(DoctorInfoFieldChecker.CheckField.college, DoctorInfoFieldChecker.CheckType.BOTH)
 				.setChecker(DoctorInfoFieldChecker.CheckField.title, DoctorInfoFieldChecker.CheckType.BOTH)
 				.setChecker(DoctorInfoFieldChecker.CheckField.specialty, DoctorInfoFieldChecker.CheckType.BOTH)
 				.setChecker(DoctorInfoFieldChecker.CheckField.availableTime, DoctorInfoFieldChecker.CheckType.BOTH)
