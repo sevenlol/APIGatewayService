@@ -141,6 +141,7 @@ public class DoctorController {
             throw exception;
 		}
 
+		// TODO modify gender mapping bug
 		// if userInfo is attached, check fields
 		DoctorInfo info = account.getUserInfo();
 		if (info != null) {
@@ -148,7 +149,7 @@ public class DoctorController {
 			DoctorInfoFieldChecker infoChecker = new DoctorInfoFieldChecker(DoctorInfoFieldChecker.ConnectType.NOT_ALL_FAIL);
 			infoChecker
 				.setChecker(DoctorInfoFieldChecker.CheckField.name, DoctorInfoFieldChecker.CheckType.BOTH)
-				.setChecker(DoctorInfoFieldChecker.CheckField.gender, DoctorInfoFieldChecker.CheckType.NON_NULL)
+				//.setChecker(DoctorInfoFieldChecker.CheckField.gender, DoctorInfoFieldChecker.CheckType.NON_NULL)
 				.setChecker(DoctorInfoFieldChecker.CheckField.phoneNumber, DoctorInfoFieldChecker.CheckType.BOTH)
 				.setChecker(DoctorInfoFieldChecker.CheckField.address, DoctorInfoFieldChecker.CheckType.BOTH)
 				.setChecker(DoctorInfoFieldChecker.CheckField.category, DoctorInfoFieldChecker.CheckType.NON_NULL)
