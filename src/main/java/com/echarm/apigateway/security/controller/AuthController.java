@@ -27,6 +27,7 @@ import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.accountsystem.model.Account;
 import com.echarm.apigateway.accountsystem.model.AdminAccount;
 import com.echarm.apigateway.accountsystem.model.DoctorAccount;
+import com.echarm.apigateway.accountsystem.model.DoctorInfo;
 import com.echarm.apigateway.accountsystem.model.UserAccount;
 import com.echarm.apigateway.accountsystem.repository.AccountRepositoryService;
 import com.echarm.apigateway.accountsystem.repository.AccountSpecification;
@@ -67,6 +68,10 @@ public class AuthController {
         			reqAccount = new UserAccount();
         		} else if (account.getUserType() == UserType.DOCTOR) {
         			reqAccount = new DoctorAccount();
+        			// TODO add defensive check here
+        			DoctorInfo info = new DoctorInfo();
+        			info.setCategory(((DoctorInfo) account.getUserInfo()).getCategory());
+        			((DoctorAccount)reqAccount).setUserInfo(info);
         		} else if (account.getUserType() == UserType.ADMIN) {
         			reqAccount = new AdminAccount();
         		} else {
