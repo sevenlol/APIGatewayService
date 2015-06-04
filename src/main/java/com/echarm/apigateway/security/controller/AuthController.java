@@ -20,7 +20,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
+import com.echarm.apigateway.accountsystem.error.NoContentException;
+import com.echarm.apigateway.accountsystem.error.ResourceExistException;
+import com.echarm.apigateway.accountsystem.error.ResourceNotExistException;
+import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.accountsystem.model.Account;
+import com.echarm.apigateway.accountsystem.repository.AccountRepositoryService;
+import com.echarm.apigateway.accountsystem.repository.AccountSpecification;
+import com.echarm.apigateway.accountsystem.repository.AccountSpecificationFactory;
 import com.echarm.apigateway.security.service.UserDetailsImpl;
 
 @RestController
@@ -29,23 +36,45 @@ public class AuthController {
     @Autowired
     private ProviderSignInUtils providerSignInUtils;
 
+    @Autowired
+    private AccountRepositoryService repository;
+
     /*
      * if the /user resource is reachable, it returns the currently authenticated user (an Authentication)
      * else, an 401 response is returned
      */
     @RequestMapping("/user")
-    public Account user(Authentication auth) {
+    public Account user(Authentication auth) throws ResourceNotExistException, NoContentException, ResourceExistException {
     	if (auth == null)
     		return null;
+
+    	// repository null, server error
+        if (repository == null) {
+            throw new ServerSideProblemException("repository null");
+        }
 
     	Object user = auth.getPrincipal();
     	if (user instanceof UserDetailsImpl) {
         	Account account = ((UserDetailsImpl) user).getAccount();
         	if (account != null) {
-        		account.setPassword(null);
-        		account.setSalt(null);
+        		Account reqAccount = new Account();
+        		reqAccount.setAccountId(account.getAccountId());
+
+        		// get account
+        		AccountSpecification specification = AccountSpecificationFactory.getFindAccountByIdSpecification(reqAccount);
+                List<Account> results = repository.query(specification);
+
+                if (results.size() != 1) {
+                    throw new ServerSideProblemException("The result (List<Account>) size should be 1");
+                }
+
+                Account resultAccount = results.get(0);
+
+                resultAccount.setPassword(null);
+                resultAccount.setSalt(null);
+
+                return resultAccount;
         	}
-            return account;
         }
 
         return null;
