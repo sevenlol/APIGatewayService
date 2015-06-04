@@ -25,9 +25,13 @@ import com.echarm.apigateway.accountsystem.error.ResourceExistException;
 import com.echarm.apigateway.accountsystem.error.ResourceNotExistException;
 import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.accountsystem.model.Account;
+import com.echarm.apigateway.accountsystem.model.AdminAccount;
+import com.echarm.apigateway.accountsystem.model.DoctorAccount;
+import com.echarm.apigateway.accountsystem.model.UserAccount;
 import com.echarm.apigateway.accountsystem.repository.AccountRepositoryService;
 import com.echarm.apigateway.accountsystem.repository.AccountSpecification;
 import com.echarm.apigateway.accountsystem.repository.AccountSpecificationFactory;
+import com.echarm.apigateway.accountsystem.util.UserType;
 import com.echarm.apigateway.security.service.UserDetailsImpl;
 
 @RestController
@@ -57,7 +61,18 @@ public class AuthController {
     	if (user instanceof UserDetailsImpl) {
         	Account account = ((UserDetailsImpl) user).getAccount();
         	if (account != null) {
-        		Account reqAccount = new Account();
+        		Account reqAccount;
+
+        		if (account.getUserType() == UserType.USER) {
+        			reqAccount = new UserAccount();
+        		} else if (account.getUserType() == UserType.DOCTOR) {
+        			reqAccount = new DoctorAccount();
+        		} else if (account.getUserType() == UserType.ADMIN) {
+        			reqAccount = new AdminAccount();
+        		} else {
+        			reqAccount = new Account();
+        		}
+
         		reqAccount.setAccountId(account.getAccountId());
 
         		// get account
@@ -69,6 +84,8 @@ public class AuthController {
                 }
 
                 Account resultAccount = results.get(0);
+
+                System.out.println(resultAccount.getUserInfo().getAddress());
 
                 resultAccount.setPassword(null);
                 resultAccount.setSalt(null);
