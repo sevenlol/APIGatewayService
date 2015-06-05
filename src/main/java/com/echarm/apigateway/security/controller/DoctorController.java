@@ -65,6 +65,8 @@ public class DoctorController {
 		// Check Input Account
 		AccountFieldChecker accountChecker = new AccountFieldChecker(AccountFieldChecker.ConnectType.ALL_PASS);
 		accountChecker
+			.setChecker(AccountFieldChecker.CheckField.username, AccountFieldChecker.CheckType.BOTH)
+			.setChecker(AccountFieldChecker.CheckField.password, AccountFieldChecker.CheckType.BOTH)
 			.setChecker(AccountFieldChecker.CheckField.email, AccountFieldChecker.CheckType.BOTH)
 			.setChecker(AccountFieldChecker.CheckField.userInfo, AccountFieldChecker.CheckType.NON_NULL);
 		if (!accountChecker.check(account)) {
@@ -82,7 +84,7 @@ public class DoctorController {
 			DoctorInfoFieldChecker infoChecker = new DoctorInfoFieldChecker(DoctorInfoFieldChecker.ConnectType.ALL_PASS);
 			infoChecker
 				.setChecker(DoctorInfoFieldChecker.CheckField.name, DoctorInfoFieldChecker.CheckType.BOTH)
-				.setChecker(DoctorInfoFieldChecker.CheckField.gender, DoctorInfoFieldChecker.CheckType.NON_NULL)
+				//.setChecker(DoctorInfoFieldChecker.CheckField.gender, DoctorInfoFieldChecker.CheckType.NON_NULL)
 				.setChecker(DoctorInfoFieldChecker.CheckField.phoneNumber, DoctorInfoFieldChecker.CheckType.BOTH)
 				.setChecker(DoctorInfoFieldChecker.CheckField.address, DoctorInfoFieldChecker.CheckType.BOTH)
 				.setChecker(DoctorInfoFieldChecker.CheckField.category, DoctorInfoFieldChecker.CheckType.NON_NULL)
