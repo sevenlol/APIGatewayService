@@ -85,16 +85,17 @@ public class DoctorController {
 			infoChecker
 				.setChecker(DoctorInfoFieldChecker.CheckField.name, DoctorInfoFieldChecker.CheckType.BOTH)
 				//.setChecker(DoctorInfoFieldChecker.CheckField.gender, DoctorInfoFieldChecker.CheckType.NON_NULL)
-				.setChecker(DoctorInfoFieldChecker.CheckField.phoneNumber, DoctorInfoFieldChecker.CheckType.BOTH)
-				.setChecker(DoctorInfoFieldChecker.CheckField.address, DoctorInfoFieldChecker.CheckType.BOTH)
-				.setChecker(DoctorInfoFieldChecker.CheckField.category, DoctorInfoFieldChecker.CheckType.NON_NULL)
+//				.setChecker(DoctorInfoFieldChecker.CheckField.phoneNumber, DoctorInfoFieldChecker.CheckType.BOTH)
+//				.setChecker(DoctorInfoFieldChecker.CheckField.address, DoctorInfoFieldChecker.CheckType.BOTH)
+				// NOTE category is combined in title field in the web
+//				.setChecker(DoctorInfoFieldChecker.CheckField.category, DoctorInfoFieldChecker.CheckType.NON_NULL)
 				.setChecker(DoctorInfoFieldChecker.CheckField.currentHospital, DoctorInfoFieldChecker.CheckType.BOTH)
 				.setChecker(DoctorInfoFieldChecker.CheckField.college, DoctorInfoFieldChecker.CheckType.BOTH)
 				.setChecker(DoctorInfoFieldChecker.CheckField.title, DoctorInfoFieldChecker.CheckType.BOTH)
 				.setChecker(DoctorInfoFieldChecker.CheckField.specialty, DoctorInfoFieldChecker.CheckType.BOTH)
 				.setChecker(DoctorInfoFieldChecker.CheckField.availableTime, DoctorInfoFieldChecker.CheckType.BOTH)
-				.setChecker(DoctorInfoFieldChecker.CheckField.facebookAccount, DoctorInfoFieldChecker.CheckType.NON_EMPTY)
-				.setChecker(DoctorInfoFieldChecker.CheckField.blogUrl, DoctorInfoFieldChecker.CheckType.NON_EMPTY);
+				/*.setChecker(DoctorInfoFieldChecker.CheckField.facebookAccount, DoctorInfoFieldChecker.CheckType.NON_EMPTY)
+				.setChecker(DoctorInfoFieldChecker.CheckField.blogUrl, DoctorInfoFieldChecker.CheckType.NON_EMPTY)*/;
 
 			if(!infoChecker.check(info)) {
 				MissingParameterErrorBody body = new MissingParameterErrorBody(MissingParameterErrorBody.generateDescription("Some Fields missing", "user_info in Body"));
