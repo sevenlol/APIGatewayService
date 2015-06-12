@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.social.security.SocialUserDetailsService;
 import org.springframework.social.security.SpringSocialConfigurer;
 
@@ -86,9 +87,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         return new SimpleSocialUserDetailsService();
     }
 
+    @Bean
+    public BCryptPasswordEncoder getPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 	@Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-	    auth.userDetailsService(new UserDetailServiceImpl());
+	    auth.userDetailsService(new UserDetailServiceImpl())
+	        .passwordEncoder(getPasswordEncoder());
 	    /*auth.inMemoryAuthentication()
 	            .withUser("user").password("1234").roles("USER")
 	        .and()

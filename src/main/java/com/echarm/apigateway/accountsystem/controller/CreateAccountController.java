@@ -2,6 +2,7 @@ package com.echarm.apigateway.accountsystem.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,10 @@ public class CreateAccountController {
         // check inputs from the http request
         ControllerUtil.checkRequestInput(true, true, account, false, false, null);
 
+        // encode password
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        account.setPassword(encoder.encode(account.getPassword()));
+
         Account result = null;
 
 		result = repository.createAccount(account);
@@ -70,6 +75,10 @@ public class CreateAccountController {
 
         // check inputs from the http request
         ControllerUtil.checkRequestInput(true, true, account, true, false, category);
+
+        // encode password
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        account.setPassword(encoder.encode(account.getPassword()));
 
         // set category
         DoctorInfo info = account.getUserInfo();
@@ -112,6 +121,10 @@ public class CreateAccountController {
 
         // check inputs from the http request
         ControllerUtil.checkRequestInput(true, true, account, false, false, null);
+
+        // encode password
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        account.setPassword(encoder.encode(account.getPassword()));
 
         Account result = null;
 
