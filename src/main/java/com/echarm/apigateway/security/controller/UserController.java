@@ -1,5 +1,6 @@
 package com.echarm.apigateway.security.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.echarm.apigateway.accountsystem.error.InvalidParameterException;
 import com.echarm.apigateway.accountsystem.error.MissingParameterErrorBody;
+import com.echarm.apigateway.accountsystem.error.NoContentException;
+import com.echarm.apigateway.accountsystem.error.ResourceExistException;
+import com.echarm.apigateway.accountsystem.error.ResourceNotExistException;
 import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.accountsystem.model.Account;
 import com.echarm.apigateway.accountsystem.model.UserAccount;
 import com.echarm.apigateway.accountsystem.model.UserInfo;
+import com.echarm.apigateway.accountsystem.repository.AccountMultiInputSpecificationFactory;
 import com.echarm.apigateway.accountsystem.repository.AccountRepositoryService;
+import com.echarm.apigateway.accountsystem.repository.AccountSpecification;
+import com.echarm.apigateway.accountsystem.repository.AccountSpecificationFactory;
 import com.echarm.apigateway.accountsystem.util.AccountFieldChecker;
 import com.echarm.apigateway.accountsystem.util.UserInfoFieldChecker;
 import com.echarm.apigateway.accountsystem.util.UserType;
@@ -30,17 +37,70 @@ public class UserController {
     private AccountRepositoryService repository;
 
 	@RequestMapping(value = "/members/users", method = RequestMethod.GET)
-    public List<UserAccount> getUsers(@RequestParam(value = "id_list", required = false) String accountIdListStr) throws InvalidParameterException {
+    public List<Account> getUsers(@RequestParam(value = "id_list", required = false) String accountIdListStr) throws InvalidParameterException, ResourceNotExistException, NoContentException, ResourceExistException {
 
 		if (accountIdListStr != null) {
 			// not null => parse str
 			String[] accountIdList = CommaDelimitedStringParser.parse(accountIdListStr);
-			// TODO get user list here
+
+			if (accountIdList == null) {
+			    throw new ServerSideProblemException("AccountIdList should not be null");
+			}
+
+			ArrayList<Account> accountList = new ArrayList<Account>();
+			for (int i = 0; i < accountIdList.length; i++) {
+			    UserAccount tmpAccount = new UserAccount();
+			    tmpAccount.setAccountId(accountIdList[i]);
+			    accountList.add(tmpAccount);
+			}
+
+			AccountSpecification multiIdSpec = AccountMultiInputSpecificationFactory.getFindAccountByAccountIdMultiInputSpecification(accountList);
+			List<Account> multiIdResults = repository.query(multiIdSpec);
+
+			// query result should not be null, server error
+	        if (multiIdResults == null) {
+	            throw new ServerSideProblemException("The result (List<Account>) from the repository should not be null");
+	        }
+
+	        // query result should have at least one element
+	        // if not, server error
+	        if (multiIdResults.size() <= 0) {
+	            throw new ServerSideProblemException("The result (List<Account>) size should be at least 1");
+	        }
+
+	        for (Account acc : multiIdResults) {
+	            acc.setPassword(null);
+	            acc.setSalt(null);
+	        }
+
+	        return multiIdResults;
 		}
 
-		// TODO get all user here
+		// set UserType
+        UserAccount account = new UserAccount();
 
-    	return null;
+        // get all UserAccounts in the database
+        // when no accounts found in the database, NoContentException is thrown
+        AccountSpecification specification = AccountSpecificationFactory.getFindAllTypedSpecification(account);
+        List<Account> results = repository.query(specification);
+
+        // query result should not be null, server error
+        if (results == null) {
+            throw new ServerSideProblemException("The result (List<Account>) from the repository should not be null");
+        }
+
+        // query result should have at least one element
+        // if not, server error
+        if (results.size() <= 0) {
+            throw new ServerSideProblemException("The result (List<Account>) size should be at least 1");
+        }
+
+        for (Account acc : results) {
+            acc.setPassword(null);
+            acc.setSalt(null);
+        }
+
+    	return results;
     }
 
 	@RequestMapping(value = "/members/users", method = RequestMethod.PUT)
