@@ -8,8 +8,8 @@ public class AccountMultiInputSpecificationFactory {
 
 	public AccountMultiInputSpecificationFactory() {
 	}
-	
-	static AccountMultiInputSpecification getFindAccountByAccountIdMultiInputSpecification(ArrayList<Account> arr) {
+
+	public static AccountMultiInputSpecification getFindAccountByAccountIdMultiInputSpecification(ArrayList<Account> arr) {
 		return new FindAccountByAccountIdMultiInputSpecification(arr);
 	}
 
