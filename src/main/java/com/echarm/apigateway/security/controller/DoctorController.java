@@ -110,6 +110,11 @@ public class DoctorController {
             throw new ServerSideProblemException("The result (List<Account>) size should be at least 1");
         }
 
+        for (Account acc : results) {
+            acc.setPassword(null);
+            acc.setSalt(null);
+        }
+
     	return results;
     }
 
@@ -194,6 +199,11 @@ public class DoctorController {
         // if not, server error
         if (results.size() <= 0) {
             throw new ServerSideProblemException("The result (List<Account>) size should be at least 1");
+        }
+
+        for (Account acc : results) {
+            acc.setPassword(null);
+            acc.setSalt(null);
         }
 
     	return results;
