@@ -1,5 +1,6 @@
 package com.echarm.apigateway.security.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,14 +12,21 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.echarm.apigateway.accountsystem.error.CategoryNotExistErrorBody;
 import com.echarm.apigateway.accountsystem.error.InvalidParameterException;
 import com.echarm.apigateway.accountsystem.error.MissingParameterErrorBody;
+import com.echarm.apigateway.accountsystem.error.NoContentException;
+import com.echarm.apigateway.accountsystem.error.ResourceExistException;
+import com.echarm.apigateway.accountsystem.error.ResourceNotExistException;
 import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.accountsystem.model.Account;
 import com.echarm.apigateway.accountsystem.model.DoctorAccount;
 import com.echarm.apigateway.accountsystem.model.DoctorInfo;
 import com.echarm.apigateway.accountsystem.model.UserInfo;
+import com.echarm.apigateway.accountsystem.repository.AccountMultiInputSpecificationFactory;
 import com.echarm.apigateway.accountsystem.repository.AccountRepositoryService;
+import com.echarm.apigateway.accountsystem.repository.AccountSpecification;
+import com.echarm.apigateway.accountsystem.repository.AccountSpecificationFactory;
 import com.echarm.apigateway.accountsystem.util.AccountFieldChecker;
 import com.echarm.apigateway.accountsystem.util.Category;
 import com.echarm.apigateway.accountsystem.util.DoctorInfoFieldChecker;
@@ -33,30 +41,162 @@ public class DoctorController {
     private AccountRepositoryService repository;
 
 	@RequestMapping(value = "/members/doctors", method = RequestMethod.GET)
-    public List<DoctorAccount> getAllDoctors(@RequestParam(value = "id_list", required = false) String accountIdListStr) throws InvalidParameterException {
-		if (accountIdListStr != null) {
+    public List<Account> getAllDoctors(@RequestParam(value = "id_list", required = false) String accountIdListStr) throws InvalidParameterException, ResourceNotExistException, NoContentException, ResourceExistException {
+
+	    // repository null, server error
+        if (repository == null) {
+            throw new ServerSideProblemException("repository null");
+        }
+
+	    if (accountIdListStr != null) {
 			// not null => parse str
 			String[] accountIdList = CommaDelimitedStringParser.parse(accountIdListStr);
-			// TODO get user list here
+
+			if (accountIdList == null) {
+                throw new ServerSideProblemException("AccountIdList should not be null");
+            }
+
+			ArrayList<Account> accountList = new ArrayList<Account>();
+            for (int i = 0; i < accountIdList.length; i++) {
+                DoctorAccount tmpAccount = new DoctorAccount();
+                tmpAccount.setAccountId(accountIdList[i]);
+                DoctorInfo info = new DoctorInfo();
+                info.setCategory(Category.Arbitrary);
+                tmpAccount.setUserInfo(info);
+                accountList.add(tmpAccount);
+            }
+
+            AccountSpecification multiIdSpec = AccountMultiInputSpecificationFactory.getFindAccountByAccountIdMultiInputSpecification(accountList);
+            List<Account> multiIdResults = repository.query(multiIdSpec);
+
+            // query result should not be null, server error
+            if (multiIdResults == null) {
+                throw new ServerSideProblemException("The result (List<Account>) from the repository should not be null");
+            }
+
+            // query result should have at least one element
+            // if not, server error
+            if (multiIdResults.size() <= 0) {
+                throw new ServerSideProblemException("The result (List<Account>) size should be at least 1");
+            }
+
+            for (Account acc : multiIdResults) {
+                acc.setPassword(null);
+                acc.setSalt(null);
+            }
+
+            return multiIdResults;
 		}
-    	return null;
+
+	    // set UserType
+        DoctorInfo info = new DoctorInfo();
+        info.setCategory(Category.Arbitrary);
+        DoctorAccount account = new DoctorAccount();
+        account.setUserInfo(info);
+
+        // get all UserAccounts in the database
+        // when no accounts found in the database, NoContentException is thrown
+        AccountSpecification specification = AccountSpecificationFactory.getFindAllTypedSpecification(account);
+        List<Account> results = repository.query(specification);
+
+        // query result should not be null, server error
+        if (results == null) {
+            throw new ServerSideProblemException("The result (List<Account>) from the repository should not be null");
+        }
+
+        // query result should have at least one element
+        // if not, server error
+        if (results.size() <= 0) {
+            throw new ServerSideProblemException("The result (List<Account>) size should be at least 1");
+        }
+
+    	return results;
     }
 
 	@RequestMapping(value = "/members/doctors/{categoryStr}", method = RequestMethod.GET)
-    public List<DoctorAccount> getDoctorsInCategory(@RequestParam(value = "id_list", required = false) String accountIdListStr,
-    												@PathVariable String categoryStr) throws InvalidParameterException {
-		Category category = null;
+    public List<Account> getDoctorsInCategory(@RequestParam(value = "id_list", required = false) String accountIdListStr,
+    												@PathVariable String categoryStr) throws InvalidParameterException, ResourceNotExistException, NoContentException, ResourceExistException {
+
+	    // repository null, server error
+        if (repository == null) {
+            throw new ServerSideProblemException("repository null");
+        }
+
+	    Category category = null;
 
 		if (categoryStr != null) {
 			category = Category.isCategoryExist(categoryStr);
 		}
 
+		if (category == null) {
+		    ResourceNotExistException exception = new ResourceNotExistException("Category "+category.toString()+" Not Exist!");
+            exception.setErrorBody(new CategoryNotExistErrorBody(category.toString()));
+            throw exception;
+		}
+
 		if (accountIdListStr != null) {
 			// not null => parse str
 			String[] accountIdList = CommaDelimitedStringParser.parse(accountIdListStr);
-			// TODO get user list here
+
+			if (accountIdList == null) {
+                throw new ServerSideProblemException("AccountIdList should not be null");
+            }
+
+            ArrayList<Account> accountList = new ArrayList<Account>();
+            for (int i = 0; i < accountIdList.length; i++) {
+                DoctorAccount tmpAccount = new DoctorAccount();
+                tmpAccount.setAccountId(accountIdList[i]);
+                DoctorInfo info = new DoctorInfo();
+                info.setCategory(category);
+                tmpAccount.setUserInfo(info);
+                accountList.add(tmpAccount);
+            }
+
+            AccountSpecification multiIdSpec = AccountMultiInputSpecificationFactory.getFindAccountByAccountIdMultiInputSpecification(accountList);
+            List<Account> multiIdResults = repository.query(multiIdSpec);
+
+            // query result should not be null, server error
+            if (multiIdResults == null) {
+                throw new ServerSideProblemException("The result (List<Account>) from the repository should not be null");
+            }
+
+            // query result should have at least one element
+            // if not, server error
+            if (multiIdResults.size() <= 0) {
+                throw new ServerSideProblemException("The result (List<Account>) size should be at least 1");
+            }
+
+            for (Account acc : multiIdResults) {
+                acc.setPassword(null);
+                acc.setSalt(null);
+            }
+
+            return multiIdResults;
 		}
-    	return null;
+
+		// set UserType
+        DoctorInfo info = new DoctorInfo();
+        info.setCategory(category);
+        DoctorAccount account = new DoctorAccount();
+        account.setUserInfo(info);
+
+        // get all DoctorAccounts in the database
+        // when no accounts found in the database, NoContentException is thrown
+        AccountSpecification specification = AccountSpecificationFactory.getFindAllTypedSpecification(account);
+        List<Account> results = repository.query(specification);
+
+        // query result should not be null, server error
+        if (results == null) {
+            throw new ServerSideProblemException("The result (List<Account>) from the repository should not be null");
+        }
+
+        // query result should have at least one element
+        // if not, server error
+        if (results.size() <= 0) {
+            throw new ServerSideProblemException("The result (List<Account>) size should be at least 1");
+        }
+
+    	return results;
     }
 
 	@RequestMapping(value = "/members/doctors", method = RequestMethod.POST)
