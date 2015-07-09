@@ -14,7 +14,8 @@ public class WebMvcConfig extends WebMvcAutoConfiguration.WebMvcAutoConfiguratio
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
        registry.addResourceHandler("/ECharmWebsite/**")
-          .addResourceLocations("file:///C:/Users/stephen/Projects/ECharmWebsite/");
+           //.addResourceLocations("file:///C:/Users/stephen/Projects/ECharmWebsite/");
+           .addResourceLocations("file:ECharmWebsite/");
 
        super.addResourceHandlers(registry);
     }
