@@ -65,6 +65,10 @@ public class FindAllTypedSpecification extends AccountSpecification {
 			}
 			else {
 				for(Account acc : list){
+				    if (!(acc.getUserInfo() instanceof DoctorInfo)) {
+				        continue;
+				    }
+
 					tempInfo = (DoctorInfo) acc.getUserInfo();
 					if(tempInfo.getCategory() == docInfo.getCategory()) {
 						if(!acc.getIsDeleted()){
