@@ -19,7 +19,8 @@ public class UserInfo {
 
     public enum Gender{
         MALE,
-        FEMALE;
+        FEMALE,
+        ARBITRARY;
 
         public static Gender isGenderExist(String gender) {
             for (Gender g : Gender.values()) {
