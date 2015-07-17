@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UserInfo {
     private String name;
     private Gender gender;
+    private Integer age;
+    private String stickerUrl;
     private String phoneNumber;
     private String address;
 
@@ -54,6 +56,16 @@ public class UserInfo {
             this.gender = Gender.valueOf(gender);
     }
 
+    @JsonProperty("age")
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    @JsonProperty("sticker_url")
+    public void setStickerUrl(String stickerUrl) {
+        this.stickerUrl = stickerUrl;
+    }
+
     @JsonProperty("phone_number")
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
@@ -84,6 +96,16 @@ public class UserInfo {
             return null;
         else
             return gender.name();
+    }
+
+    @JsonProperty("age")
+    public Integer getAge() {
+        return age;
+    }
+
+    @JsonProperty("sticker_url")
+    public String getStickerUrl() {
+        return stickerUrl;
     }
 
     @JsonProperty("phone_number")
@@ -165,7 +187,13 @@ public class UserInfo {
     		fieldNameList.add("Name");
 
     	if (gender != null)
-    		fieldNameList.add("GenderString");
+    		fieldNameList.add("Gender");
+
+    	if (age != null)
+            fieldNameList.add("Age");
+
+    	if (stickerUrl != null)
+            fieldNameList.add("StickerUrl");
 
     	if (phoneNumber != null)
     		fieldNameList.add("PhoneNumber");
