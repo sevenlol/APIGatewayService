@@ -75,6 +75,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	    .and()
             .apply(getSpringSocialConfigurer())
         .and().logout();
+
+	    http.headers().cacheControl().disable();
 	}
 
 	private SpringSocialConfigurer getSpringSocialConfigurer() {
