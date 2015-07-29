@@ -12,6 +12,7 @@ import com.echarm.apigateway.accountsystem.error.ResourceExistException;
 import com.echarm.apigateway.accountsystem.error.ResourceNotExistException;
 import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.accountsystem.model.Account;
+import com.echarm.apigateway.accountsystem.util.AccountType;
 import com.echarm.apigateway.accountsystem.util.QueryFactory;
 import com.echarm.apigateway.accountsystem.util.Time;
 import com.echarm.apigateway.accountsystem.util.UserType;
@@ -59,7 +60,23 @@ public class CreateAccountBasicSpecification extends AccountBasicSpecification {
 			throw e;
 		}
 
-		account.setAccountId(Time.getCurrentTimeMillisStr());
+		// preserve accountId for FB implicit sign up
+		// generate a new one otherwise
+		if (AccountType.FACEBOOK != account.getAccountType() || account.getAccountId() == null) {
+		    account.setAccountId(Time.getCurrentTimeMillisStr());
+		} else {
+		    // check if the accountId already exist
+		    Query searchFBAccQuery = new Query();
+		    searchFBAccQuery.addCriteria(Criteria.where("_id").is(account.getAccountId()));
+		    searchFBAccQuery.addCriteria(Criteria.where("isDeleted").is(false));
+		    if (mongoTemplate.exists(query, Account.class)) {
+		        // account exists throw error
+		        AccountExistErrorBody eb = new AccountExistErrorBody("ID: " + account.getAccountId(), "");
+	            ResourceExistException e = new ResourceExistException("Account with ID: " + account.getAccountId() + " exists!");
+	            e.setErrorBody(eb);
+	            throw e;
+		    }
+		}
 		account.setIsDeleted(false);;
 		mongoTemplate.save(account, typeName);
 		/*
