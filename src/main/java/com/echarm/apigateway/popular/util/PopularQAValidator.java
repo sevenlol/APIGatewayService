@@ -3,7 +3,7 @@ package com.echarm.apigateway.popular.util;
 import java.util.Map;
 import java.util.Set;
 
-import com.echarm.apigateway.popular.model.PopularQuestionAndAnswer;
+import com.echarm.apigateway.popular.model.PopularQA;
 import com.echarm.apigateway.util.ValidateRule;
 import com.echarm.apigateway.util.ValidateType;
 
@@ -18,7 +18,7 @@ public class PopularQAValidator {
         builder = new StringBuilder();
     }
 
-    public boolean validate(PopularQuestionAndAnswer qa) {
+    public boolean validate(PopularQA qa) {
         if (qa == null) return false;
         if (rule == null || map == null) return false;
         if (map.size() == 0) return true;
@@ -55,7 +55,7 @@ public class PopularQAValidator {
             return null;
     }
 
-    private boolean validateField(PopularQuestionAndAnswer qa, PopularQAField field, ValidateType type) {
+    private boolean validateField(PopularQA qa, PopularQAField field, ValidateType type) {
         if (qa == null || field == null || type == null) return false;
 
         switch(field) {

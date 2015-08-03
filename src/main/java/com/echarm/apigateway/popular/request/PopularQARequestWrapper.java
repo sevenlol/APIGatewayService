@@ -1,6 +1,6 @@
 package com.echarm.apigateway.popular.request;
 
-import com.echarm.apigateway.popular.model.PopularQuestionAndAnswer;
+import com.echarm.apigateway.popular.model.PopularQA;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,13 +8,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(Include.NON_NULL)
 public class PopularQARequestWrapper {
 
-    private PopularQuestionAndAnswer qa;
+    private PopularQA qa;
 
-    public PopularQARequestWrapper() { this.qa = new PopularQuestionAndAnswer(); }
+    public PopularQARequestWrapper() { this.qa = new PopularQA(); }
 
     /* getter methods */
 
-    public PopularQuestionAndAnswer getPopularQA() { return qa; }
+    public PopularQA getPopularQA() { return qa; }
 
     /* setter methods */
 

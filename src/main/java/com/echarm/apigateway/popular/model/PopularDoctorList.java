@@ -1,6 +1,6 @@
 package com.echarm.apigateway.popular.model;
 
-import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -11,7 +11,7 @@ public class PopularDoctorList {
 
     private String listId;
     private String listCategory;
-    private List<PopularDoctor> doctorList;
+    private Map<String, PopularDoctor> doctorMap;
 
     public PopularDoctorList() {}
 
@@ -19,7 +19,7 @@ public class PopularDoctorList {
 
     @JsonIgnore public String getListId() { return listId; }
     @JsonIgnore public String getListCategory() { return listCategory; }
-    @JsonIgnore public List<PopularDoctor> getDoctorList() { return doctorList; }
+    @JsonIgnore public Map<String, PopularDoctor> getDoctorMap() { return doctorMap; }
 
     /* setter methods */
 
@@ -34,7 +34,7 @@ public class PopularDoctorList {
     }
 
     @JsonIgnore
-    public PopularDoctorList setDoctorList(List<PopularDoctor> doctorList) {
-        this.doctorList = doctorList; return this;
+    public PopularDoctorList setDoctorMap(Map<String, PopularDoctor> doctorMap) {
+        this.doctorMap = doctorMap; return this;
     }
 }

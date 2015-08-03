@@ -1,12 +1,12 @@
 package com.echarm.apigateway.popular.model;
 
-import java.util.List;
+import java.util.Map;
 
 public class PopularArticleList {
 
     private String listId;
     private String listCategory;
-    private List<PopularArticle> articleList;
+    private Map<String, PopularArticle> articleMap;
 
     public PopularArticleList() {}
 
@@ -14,7 +14,7 @@ public class PopularArticleList {
 
     public String getListId() { return listId; }
     public String getListCategory() { return listCategory; }
-    public List<PopularArticle> getArticleList() { return articleList; }
+    public Map<String, PopularArticle> getArticleMap() { return articleMap; }
 
     /* setter methods */
 
@@ -26,7 +26,7 @@ public class PopularArticleList {
         this.listCategory = listCategory; return this;
     }
 
-    public PopularArticleList setArticleList(List<PopularArticle> articleList) {
-        this.articleList = articleList; return this;
+    public PopularArticleList setArticleMap(Map<String, PopularArticle> articleMap) {
+        this.articleMap = articleMap; return this;
     }
 }

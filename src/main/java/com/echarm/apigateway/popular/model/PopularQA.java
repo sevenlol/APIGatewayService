@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class PopularQuestionAndAnswer {
+public class PopularQA {
 
     /* question fields */
     private String questionCategory;
@@ -20,7 +20,7 @@ public class PopularQuestionAndAnswer {
     private String answererId;
     private String answererName;
 
-    public PopularQuestionAndAnswer() {}
+    public PopularQA() {}
 
     /* getter methods */
 
@@ -38,47 +38,47 @@ public class PopularQuestionAndAnswer {
     /* setter methods */
 
     @JsonIgnore
-    public PopularQuestionAndAnswer setQuestionCategory(String questionCategory) {
+    public PopularQA setQuestionCategory(String questionCategory) {
         this.questionCategory = questionCategory; return this;
     }
 
     @JsonIgnore
-    public PopularQuestionAndAnswer setQuestionId(String questionId) {
+    public PopularQA setQuestionId(String questionId) {
         this.questionId = questionId; return this;
     }
 
     @JsonIgnore
-    public PopularQuestionAndAnswer setQuestionContent(String questionContent) {
+    public PopularQA setQuestionContent(String questionContent) {
         this.questionContent = questionContent; return this;
     }
 
     @JsonIgnore
-    public PopularQuestionAndAnswer setQuestionerId(String questionerId) {
+    public PopularQA setQuestionerId(String questionerId) {
         this.questionerId = questionerId; return this;
     }
 
     @JsonIgnore
-    public PopularQuestionAndAnswer setQuestionerName(String questionerName) {
+    public PopularQA setQuestionerName(String questionerName) {
         this.questionerName = questionerName; return this;
     }
 
     @JsonIgnore
-    public PopularQuestionAndAnswer setAnswerId(String answerId) {
+    public PopularQA setAnswerId(String answerId) {
         this.answerId = answerId; return this;
     }
 
     @JsonIgnore
-    public PopularQuestionAndAnswer setAnswerContent(String answerContent) {
+    public PopularQA setAnswerContent(String answerContent) {
         this.answerContent = answerContent; return this;
     }
 
     @JsonIgnore
-    public PopularQuestionAndAnswer setAnswererId(String answererId) {
+    public PopularQA setAnswererId(String answererId) {
         this.answererId = answererId; return this;
     }
 
     @JsonIgnore
-    public PopularQuestionAndAnswer setAnswererName(String answererName) {
+    public PopularQA setAnswererName(String answererName) {
         this.answererName = answererName; return this;
     }
 }
