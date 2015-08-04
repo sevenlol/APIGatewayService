@@ -94,7 +94,7 @@ public class CreatePopularListController {
         PopularArticleList result = articleListRepository.createPopularArticleList(createList);
 
         if (result == null || result.getArticleMap() == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Result popular article list repository should not be null or have null map!");
+            throw PopularListExceptionFactory.getServerProblemException("Result popular article list should not be null or have null map!");
         }
 
         // create response
