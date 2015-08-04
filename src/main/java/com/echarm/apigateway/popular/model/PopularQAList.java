@@ -2,11 +2,16 @@ package com.echarm.apigateway.popular.model;
 
 import java.util.Map;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+@Document
 public class PopularQAList {
 
-    private String listId;
-    private String listCategory;
-    private Map<String, PopularQA> qaMap;
+    @Id private String listId;
+    @Field("list_category") private String listCategory;
+    @Field("article_map") private Map<String, PopularQA> qaMap;
 
     public PopularQAList() {}
 

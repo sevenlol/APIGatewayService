@@ -1,5 +1,7 @@
 package com.echarm.apigateway.popular.model;
 
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -8,17 +10,17 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class PopularQA {
 
     /* question fields */
-    private String questionCategory;
-    private String questionId;
-    private String questionContent;
-    private String questionerId;
-    private String questionerName;
+    @Field("question_category") private String questionCategory;
+    @Field("question_id") private String questionId;
+    @Field("question_content") private String questionContent;
+    @Field("questioner_id") private String questionerId;
+    @Field("questioner_name") private String questionerName;
 
     /* answer fields */
-    private String answerId;
-    private String answerContent;
-    private String answererId;
-    private String answererName;
+    @Field("answer_id") private String answerId;
+    @Field("answer_content") private String answerContent;
+    @Field("answerer_id") private String answererId;
+    @Field("answerer_name") private String answererName;
 
     public PopularQA() {}
 
