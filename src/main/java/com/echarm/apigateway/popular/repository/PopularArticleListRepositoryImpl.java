@@ -9,8 +9,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import com.echarm.apigateway.accountsystem.error.ResourceNotExistException;
 import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.config.MongoConfig;
+import com.echarm.apigateway.popular.error.PopularArticleListNotExistErrorBody;
 import com.echarm.apigateway.popular.model.PopularArticle;
 import com.echarm.apigateway.popular.model.PopularArticleList;
 import com.echarm.apigateway.popular.util.PopularListDbUtilities;
@@ -72,22 +74,127 @@ public class PopularArticleListRepositoryImpl implements PopularArticleListRepos
     @Override
     public PopularArticleList updatePopularArticleList(
             PopularArticleList articleList) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
+        // check for all required fields
+        defensiveCheck(mongoTemplate, articleList);
+
+        // check if the document exists
+        Query searchQuery = new Query().addCriteria(Criteria.where("_id").is(articleList.getListId()));
+        if (!mongoTemplate.exists(searchQuery, PopularArticleList.class, MongoConfig.POPULAR_LIST_COLLECTION_NAME)) {
+            // document not exists, update failed
+            // throw resource not exist exception
+            ResourceNotExistException e = new ResourceNotExistException("Popular article list does not exist!");
+            e.setErrorBody(new PopularArticleListNotExistErrorBody(articleList.getListId()));
+            throw e;
+        } else {
+            // document exists, perform update
+            PopularArticleList listInDb = mongoTemplate.findOne(searchQuery, PopularArticleList.class, MongoConfig.POPULAR_LIST_COLLECTION_NAME);
+            if (listInDb != null && articleList.getArticleMap() != null) {
+                Map<String, PopularArticle> mapInDb = listInDb.getArticleMap();
+                if (mapInDb == null) {
+                    // nothing in list, update failed
+                    for (String key : articleList.getArticleMap().keySet()) {
+                        // empty all lists indicating all failed
+                        emptyPopularArticle(articleList.getArticleMap().get(key));
+                    }
+                    return articleList;
+                }
+
+                boolean isChanged = false;
+                for (String id : articleList.getArticleMap().keySet()) {
+                    if (!mapInDb.containsKey(id)) {
+                        // article not exists in db, empty input article to indicate update failed for this item
+                        emptyPopularArticle(articleList.getArticleMap().get(id));
+                    } else {
+                        // article exists in db, update
+                        mapInDb.put(id, articleList.getArticleMap().get(id));
+                        isChanged = true;
+                    }
+                }
+
+                if (isChanged) {
+                    mongoTemplate.save(listInDb, MongoConfig.POPULAR_LIST_COLLECTION_NAME);
+                }
+                return articleList;
+            } else {
+                // not suppose to happen
+                throw new ServerSideProblemException("Document found or input article list should not be null!");
+            }
+        }
     }
 
     @Override
     public PopularArticleList deletePopularArticleList(
             PopularArticleList articleList) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
+        // check for all required fields
+        defensiveCheck(mongoTemplate, articleList);
+
+        // check if the document exists
+        Query searchQuery = new Query().addCriteria(Criteria.where("_id").is(articleList.getListId()));
+        if (!mongoTemplate.exists(searchQuery, PopularArticleList.class, MongoConfig.POPULAR_LIST_COLLECTION_NAME)) {
+            // document not exists, update failed
+            // throw resource not exist exception
+            ResourceNotExistException e = new ResourceNotExistException("Popular article list does not exist!");
+            e.setErrorBody(new PopularArticleListNotExistErrorBody(articleList.getListId()));
+            throw e;
+        } else {
+            // document exists, perform delete
+            PopularArticleList listInDb = mongoTemplate.findOne(searchQuery, PopularArticleList.class, MongoConfig.POPULAR_LIST_COLLECTION_NAME);
+            if (listInDb != null && articleList.getArticleMap() != null) {
+                Map<String, PopularArticle> mapInDb = listInDb.getArticleMap();
+                if (mapInDb == null) {
+                    // nothing in list, delete failed
+                    for (String key : articleList.getArticleMap().keySet()) {
+                        // empty all lists indicating all failed
+                        emptyPopularArticle(articleList.getArticleMap().get(key));
+                    }
+                    return articleList;
+                }
+
+                boolean isChanged = false;
+                for (String id : articleList.getArticleMap().keySet()) {
+                    if (!mapInDb.containsKey(id)) {
+                        // article not exists in db, empty input article to indicate delete failed for this item
+                        emptyPopularArticle(articleList.getArticleMap().get(id));
+                    } else {
+                        // article exists in db, delete
+                        mapInDb.remove(id);
+                        isChanged = true;
+                    }
+                }
+
+                if (isChanged) {
+                    mongoTemplate.save(listInDb, MongoConfig.POPULAR_LIST_COLLECTION_NAME);
+                }
+                return articleList;
+            } else {
+                // not suppose to happen
+                throw new ServerSideProblemException("Document found or input article list should not be null!");
+            }
+        }
     }
 
     @Override
     public PopularArticleList readPopularArticleList(
             PopularArticleList articleList) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
+        // check for all required fields
+        defensiveCheck(mongoTemplate, articleList);
+
+        // check if the document exists
+        Query searchQuery = new Query().addCriteria(Criteria.where("_id").is(articleList.getListId()));
+        if (!mongoTemplate.exists(searchQuery, PopularArticleList.class, MongoConfig.POPULAR_LIST_COLLECTION_NAME)) {
+            // throw resource not exist exception
+            ResourceNotExistException e = new ResourceNotExistException("Popular article list does not exist!");
+            e.setErrorBody(new PopularArticleListNotExistErrorBody(articleList.getListId()));
+            throw e;
+        } else {
+            PopularArticleList listInDb = mongoTemplate.findOne(searchQuery, PopularArticleList.class, MongoConfig.POPULAR_LIST_COLLECTION_NAME);
+            if (listInDb == null) {
+                // not suppose to happen
+                throw new ServerSideProblemException("Document found or input article list should not be null!");
+            } else {
+                return listInDb;
+            }
+        }
     }
 
     // indicating create, update or delete fail

@@ -1,5 +1,7 @@
 package com.echarm.apigateway.popular.model;
 
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import com.echarm.apigateway.accountsystem.util.Category;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -8,12 +10,12 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class PopularArticle {
 
-    private String articleTitle;
-    private String articleId;
-    private String articleCategory;
-    private String authorId;
-    private String authorName;
-    private Category authorCategory;
+    @Field("article_title") private String articleTitle;
+    @Field("article_id") private String articleId;
+    @Field("article_category") private String articleCategory;
+    @Field("author_id") private String authorId;
+    @Field("author_name") private String authorName;
+    @Field("author_category") private Category authorCategory;
 
     public PopularArticle() {}
 
