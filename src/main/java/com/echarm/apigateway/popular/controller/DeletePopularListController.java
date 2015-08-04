@@ -1,7 +1,6 @@
 package com.echarm.apigateway.popular.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.echarm.apigateway.popular.error.PopularListExceptionFactory;
 import com.echarm.apigateway.popular.model.PopularArticle;
 import com.echarm.apigateway.popular.model.PopularArticleList;
+import com.echarm.apigateway.popular.model.PopularDoctor;
+import com.echarm.apigateway.popular.model.PopularDoctorList;
 import com.echarm.apigateway.popular.repository.PopularArticleListRepository;
+import com.echarm.apigateway.popular.repository.PopularDoctorListRepository;
 import com.echarm.apigateway.popular.response.IdStatusListResponse;
 import com.echarm.apigateway.popular.response.PopularArticleListResponseFactory;
-import com.echarm.apigateway.popular.response.PopularDoctorResponseWrapper;
-import com.echarm.apigateway.popular.response.PopularQAResponseWrapper;
+import com.echarm.apigateway.popular.response.PopularDoctorListResponseFactory;
 import com.echarm.apigateway.popular.util.PopularListDocumentId;
 import com.echarm.apigateway.security.util.CommaDelimitedStringParser;
 
@@ -29,6 +30,9 @@ public class DeletePopularListController {
 
     @Autowired
     private PopularArticleListRepository articleListRepository;
+
+    @Autowired
+    private PopularDoctorListRepository doctorListRepository;
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/popular/articles/{category}", method = RequestMethod.DELETE)
@@ -80,15 +84,53 @@ public class DeletePopularListController {
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/popular/doctors/{category}", method = RequestMethod.DELETE)
-    public List<PopularDoctorResponseWrapper> updatePopularDoctorList(
+    public IdStatusListResponse updatePopularDoctorList(
             @PathVariable String category,
-            @RequestParam(value = "id_list", required = false) String idList) {
-        return null;
+            @RequestParam(value = "id_list", required = false) String idList) throws Exception {
+
+        if (doctorListRepository == null) {
+            throw PopularListExceptionFactory.getServerProblemException("Popular doctor list repository should not be null!");
+        }
+
+        if (category == null || category.equals("")) {
+            throw PopularListExceptionFactory.getMissingParamException(
+                    "String: category", "Path", "Query parameter category should not be null or empty");
+        }
+
+        // check id_list
+        String[] idArr = CommaDelimitedStringParser.parse(idList);
+
+        if (idArr == null || idArr.length == 0) {
+            throw PopularListExceptionFactory.getServerProblemException("Id array should not be null or has size 0!");
+        }
+
+        // create list for delete
+        Map<String, PopularDoctor> map = new HashMap<String, PopularDoctor>();
+        for (String id : idArr) {
+            if (id == null || id.equals("")) {
+                continue;
+            }
+
+            PopularDoctor doctor = new PopularDoctor().setDoctorId(id).setDoctorName("FOR EXAMINATION");
+            map.put(id, doctor);
+        }
+
+        PopularDoctorList deleteList = new PopularDoctorList()
+                                                .setListCategory(category)
+                                                .setListId(PopularListDocumentId.getPopularDoctorListId(category))
+                                                .setDoctorMap(map);
+
+        PopularDoctorList result = doctorListRepository.deleteDoctorList(deleteList);
+
+        if (result == null || result.getDoctorMap() == null) {
+            throw PopularListExceptionFactory.getServerProblemException("Result popular doctor list should not be null or have null map!");
+        }
+        return PopularDoctorListResponseFactory.getIdStatusListResponse(result);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/popular/qas/{category}", method = RequestMethod.DELETE)
-    public List<PopularQAResponseWrapper> updatePopularQAList(
+    public IdStatusListResponse updatePopularQAList(
             @PathVariable String category,
             @RequestParam(value = "id_list", required = false) String idList) {
         return null;

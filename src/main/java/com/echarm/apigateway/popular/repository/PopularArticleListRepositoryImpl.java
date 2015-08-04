@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import com.echarm.apigateway.accountsystem.error.NoContentException;
 import com.echarm.apigateway.accountsystem.error.ResourceNotExistException;
 import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.config.MongoConfig;
@@ -188,10 +189,13 @@ public class PopularArticleListRepositoryImpl implements PopularArticleListRepos
             throw e;
         } else {
             PopularArticleList listInDb = mongoTemplate.findOne(searchQuery, PopularArticleList.class, MongoConfig.POPULAR_LIST_COLLECTION_NAME);
-            if (listInDb == null) {
+            if (listInDb == null || listInDb.getArticleMap() == null) {
                 // not suppose to happen
                 throw new ServerSideProblemException("Document found or input article list should not be null!");
             } else {
+                if (listInDb.getArticleMap().size() == 0) {
+                    throw new NoContentException();
+                }
                 return listInDb;
             }
         }

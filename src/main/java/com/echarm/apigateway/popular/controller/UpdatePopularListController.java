@@ -16,14 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 import com.echarm.apigateway.popular.error.PopularListExceptionFactory;
 import com.echarm.apigateway.popular.model.PopularArticle;
 import com.echarm.apigateway.popular.model.PopularArticleList;
+import com.echarm.apigateway.popular.model.PopularDoctor;
+import com.echarm.apigateway.popular.model.PopularDoctorList;
 import com.echarm.apigateway.popular.repository.PopularArticleListRepository;
+import com.echarm.apigateway.popular.repository.PopularDoctorListRepository;
 import com.echarm.apigateway.popular.request.PopularArticleRequestWrapper;
 import com.echarm.apigateway.popular.request.PopularDoctorRequestWrapper;
 import com.echarm.apigateway.popular.request.PopularQARequestWrapper;
 import com.echarm.apigateway.popular.response.IdStatusListResponse;
 import com.echarm.apigateway.popular.response.PopularArticleListResponseFactory;
+import com.echarm.apigateway.popular.response.PopularDoctorListResponseFactory;
 import com.echarm.apigateway.popular.util.PopularArticleValidator;
 import com.echarm.apigateway.popular.util.PopularArticleValidatorFactory;
+import com.echarm.apigateway.popular.util.PopularDoctorValidator;
+import com.echarm.apigateway.popular.util.PopularDoctorValidatorFactory;
 import com.echarm.apigateway.popular.util.PopularListDocumentId;
 
 @RestController
@@ -31,6 +37,9 @@ public class UpdatePopularListController {
 
     @Autowired
     private PopularArticleListRepository articleListRepository;
+
+    @Autowired
+    private PopularDoctorListRepository doctorListRepository;
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/popular/articles/{category}", method = RequestMethod.PUT)
@@ -59,10 +68,10 @@ public class UpdatePopularListController {
         // validate popular article fields
         PopularArticleValidator nonNullValidator = PopularArticleValidatorFactory.getAllFieldNotNullValidator();
         PopularArticleValidator nonEmptyValidator = PopularArticleValidatorFactory.getAllFieldNonEmptyValidator();
-        PopularArticleList createList = new PopularArticleList()
+        PopularArticleList updateList = new PopularArticleList()
                                                 .setListCategory(category)
                                                 .setListId(PopularListDocumentId.getPopularArticleListId(category));
-        Map<String, PopularArticle> createMap = new HashMap<String, PopularArticle>();
+        Map<String, PopularArticle> updateMap = new HashMap<String, PopularArticle>();
         for (PopularArticleRequestWrapper wrapper : articleList) {
             if (wrapper == null || wrapper.getPopularArticle() == null) {
                 throw PopularListExceptionFactory.getMissingParamException(
@@ -85,12 +94,12 @@ public class UpdatePopularListController {
                         "JSON Array in Body",
                         "Popular article object in body contains empty fields!");
             }
-            createMap.put(article.getArticleId(), article);
+            updateMap.put(article.getArticleId(), article);
         }
-        createList.setArticleMap(createMap);
+        updateList.setArticleMap(updateMap);
 
         // validation done, create
-        PopularArticleList result = articleListRepository.updatePopularArticleList(createList);
+        PopularArticleList result = articleListRepository.updatePopularArticleList(updateList);
 
         if (result == null || result.getArticleMap() == null) {
             throw PopularListExceptionFactory.getServerProblemException("Result popular article list repository should not be null or have null map!");
@@ -102,10 +111,70 @@ public class UpdatePopularListController {
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/popular/doctors/{category}", method = RequestMethod.PUT)
-    public List<IdStatusListResponse> updatePopularDoctorList(
+    public IdStatusListResponse updatePopularDoctorList(
             @RequestBody(required=false) List<PopularDoctorRequestWrapper> doctorList,
-            @PathVariable String category) {
-        return null;
+            @PathVariable String category) throws Exception {
+
+        if (doctorListRepository == null) {
+            throw PopularListExceptionFactory.getServerProblemException("Popular doctor list repository should not be null!");
+        }
+
+        // validate JSON body
+        if (category == null || category.equals("")) {
+            throw PopularListExceptionFactory.getMissingParamException(
+                    "String: category", "Path", "Query parameter category should not be null or empty");
+        }
+
+        if (doctorList == null) {
+            throw PopularListExceptionFactory.getMissingParamException(
+                    "JSON: popular doctor list", "Body", "JSON body should not be null");
+        }
+        if (doctorList.size() == 0) {
+            throw PopularListExceptionFactory.getEmptyParamException(
+                    "JSON: popular doctor list", "Body", "JSON body should not be empty");
+        }
+
+        // validate popular doctor fields
+        PopularDoctorValidator nonNullValidator = PopularDoctorValidatorFactory.getAllFieldNotNullValidator();
+        PopularDoctorValidator nonEmptyValidator = PopularDoctorValidatorFactory.getAllFieldNonEmptyValidator();
+        Map<String, PopularDoctor> updateMap = new HashMap<String, PopularDoctor>();
+        for (PopularDoctorRequestWrapper wrapper : doctorList) {
+            if (wrapper == null || wrapper.getPopularDoctor() == null) {
+                throw PopularListExceptionFactory.getMissingParamException(
+                        "JSON Object: popular doctor",
+                        "JSON Array in Body",
+                        "Popular doctor object in body should not be null!");
+            }
+
+            PopularDoctor doctor = wrapper.getPopularDoctor();
+            if (!nonNullValidator.validate(doctor)) {
+                throw PopularListExceptionFactory.getMissingParamException(
+                        "JSON Object: popular doctor",
+                        "JSON Array in Body",
+                        "Popular doctor object in body contains null fields!");
+            }
+
+            if (!nonEmptyValidator.validate(doctor)) {
+                throw PopularListExceptionFactory.getEmptyParamException(
+                        "JSON Object: popular doctor",
+                        "JSON Array in Body",
+                        "Popular doctor object in body contains empty fields!");
+            }
+            updateMap.put(doctor.getDoctorId(), doctor);
+        }
+        PopularDoctorList updateList = new PopularDoctorList()
+                                                .setListCategory(category)
+                                                .setListId(PopularListDocumentId.getPopularDoctorListId(category))
+                                                .setDoctorMap(updateMap);
+
+        // validation done, update
+        PopularDoctorList result = doctorListRepository.updateDoctorList(updateList);
+
+        if (result == null || result.getDoctorMap() == null) {
+            throw PopularListExceptionFactory.getServerProblemException("Result popular doctor list should not be null or have null map!");
+        }
+
+        return PopularDoctorListResponseFactory.getIdStatusListResponse(result);
     }
 
     @ResponseStatus(HttpStatus.OK)
