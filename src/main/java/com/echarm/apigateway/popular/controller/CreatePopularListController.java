@@ -18,19 +18,25 @@ import com.echarm.apigateway.popular.model.PopularArticle;
 import com.echarm.apigateway.popular.model.PopularArticleList;
 import com.echarm.apigateway.popular.model.PopularDoctor;
 import com.echarm.apigateway.popular.model.PopularDoctorList;
+import com.echarm.apigateway.popular.model.PopularQA;
+import com.echarm.apigateway.popular.model.PopularQAList;
 import com.echarm.apigateway.popular.repository.PopularArticleListRepository;
 import com.echarm.apigateway.popular.repository.PopularDoctorListRepository;
+import com.echarm.apigateway.popular.repository.PopularQAListRepository;
 import com.echarm.apigateway.popular.request.PopularArticleRequestWrapper;
 import com.echarm.apigateway.popular.request.PopularDoctorRequestWrapper;
 import com.echarm.apigateway.popular.request.PopularQARequestWrapper;
 import com.echarm.apigateway.popular.response.IdStatusListResponse;
 import com.echarm.apigateway.popular.response.PopularArticleListResponseFactory;
 import com.echarm.apigateway.popular.response.PopularDoctorListResponseFactory;
+import com.echarm.apigateway.popular.response.PopularQAListResponseFactory;
 import com.echarm.apigateway.popular.util.PopularArticleValidator;
 import com.echarm.apigateway.popular.util.PopularArticleValidatorFactory;
 import com.echarm.apigateway.popular.util.PopularDoctorValidator;
 import com.echarm.apigateway.popular.util.PopularDoctorValidatorFactory;
 import com.echarm.apigateway.popular.util.PopularListDocumentId;
+import com.echarm.apigateway.popular.util.PopularQAValidator;
+import com.echarm.apigateway.popular.util.PopularQAValidatorFactory;
 
 @RestController
 public class CreatePopularListController {
@@ -40,6 +46,9 @@ public class CreatePopularListController {
 
     @Autowired
     private PopularDoctorListRepository doctorListRepository;
+
+    @Autowired
+    private PopularQAListRepository qaListRepository;
 
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/popular/articles/{category}", method = RequestMethod.POST)
@@ -181,7 +190,66 @@ public class CreatePopularListController {
     @RequestMapping(value = "/popular/qas/{category}", method = RequestMethod.POST)
     public IdStatusListResponse createPopularQAList(
             @RequestBody(required=false) List<PopularQARequestWrapper> qaList,
-            @PathVariable String category) {
-        return null;
+            @PathVariable String category) throws Exception {
+
+        if (qaListRepository == null) {
+            throw PopularListExceptionFactory.getServerProblemException("Popular qa list repository should not be null!");
+        }
+
+        if (category == null || category.equals("")) {
+            throw PopularListExceptionFactory.getMissingParamException(
+                    "String: category", "Path", "Query parameter category should not be null or empty");
+        }
+
+        if (qaList == null) {
+            throw PopularListExceptionFactory.getMissingParamException(
+                    "JSON: popular qa list", "Body", "JSON body should not be null");
+        }
+        if (qaList.size() == 0) {
+            throw PopularListExceptionFactory.getEmptyParamException(
+                    "JSON: popular qa list", "Body", "JSON body should not be empty");
+        }
+
+        // validate popular qa fields
+        PopularQAValidator nonNullValidator = PopularQAValidatorFactory.getAllFieldNotNullValidator();
+        PopularQAValidator nonEmptyValidator = PopularQAValidatorFactory.getAllFieldNonEmptyValidator();
+        Map<String, PopularQA> createMap = new HashMap<String, PopularQA>();
+        for (PopularQARequestWrapper wrapper : qaList) {
+            if (wrapper == null || wrapper.getPopularQA() == null) {
+                throw PopularListExceptionFactory.getMissingParamException(
+                        "JSON Object: popular qa",
+                        "JSON Array in Body",
+                        "Popular qa object in body should not be null!");
+            }
+
+            PopularQA qa = wrapper.getPopularQA();
+            if (!nonNullValidator.validate(qa)) {
+                throw PopularListExceptionFactory.getMissingParamException(
+                        "JSON Object: popular qa",
+                        "JSON Array in Body",
+                        "Popular qa object in body contains null fields!");
+            }
+
+            if (!nonEmptyValidator.validate(qa)) {
+                throw PopularListExceptionFactory.getEmptyParamException(
+                        "JSON Object: popular qa",
+                        "JSON Array in Body",
+                        "Popular qa object in body contains empty fields!");
+            }
+            createMap.put(qa.getQuestionId(), qa);
+        }
+        PopularQAList createList = new PopularQAList()
+                                                .setListCategory(category)
+                                                .setListId(PopularListDocumentId.getPopularQAListId(category))
+                                                .setQaMap(createMap);
+
+        // validation done, create
+        PopularQAList result = qaListRepository.createQAList(createList);
+
+        if (result == null || result.getQaMap() == null) {
+            throw PopularListExceptionFactory.getServerProblemException("Result popular qa list should not be null or have null map!");
+        }
+
+        return PopularQAListResponseFactory.getIdStatusListResponse(result);
     }
 }

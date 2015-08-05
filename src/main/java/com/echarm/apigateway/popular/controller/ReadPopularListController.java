@@ -13,12 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.echarm.apigateway.popular.error.PopularListExceptionFactory;
 import com.echarm.apigateway.popular.model.PopularArticleList;
 import com.echarm.apigateway.popular.model.PopularDoctorList;
+import com.echarm.apigateway.popular.model.PopularQAList;
 import com.echarm.apigateway.popular.repository.PopularArticleListRepository;
 import com.echarm.apigateway.popular.repository.PopularDoctorListRepository;
+import com.echarm.apigateway.popular.repository.PopularQAListRepository;
 import com.echarm.apigateway.popular.response.PopularArticleListResponseFactory;
 import com.echarm.apigateway.popular.response.PopularArticleResponseWrapper;
 import com.echarm.apigateway.popular.response.PopularDoctorListResponseFactory;
 import com.echarm.apigateway.popular.response.PopularDoctorResponseWrapper;
+import com.echarm.apigateway.popular.response.PopularQAListResponseFactory;
 import com.echarm.apigateway.popular.response.PopularQAResponseWrapper;
 import com.echarm.apigateway.popular.util.PopularListDocumentId;
 
@@ -30,6 +33,9 @@ public class ReadPopularListController {
 
     @Autowired
     private PopularDoctorListRepository doctorListRepository;
+
+    @Autowired
+    private PopularQAListRepository qaListRepository;
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/popular/articles/{category}", method = RequestMethod.GET)
@@ -85,7 +91,27 @@ public class ReadPopularListController {
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/popular/qas/{category}", method = RequestMethod.GET)
-    public List<PopularQAResponseWrapper> updatePopularQAList(@PathVariable String category) {
-        return null;
+    public List<PopularQAResponseWrapper> updatePopularQAList(@PathVariable String category) throws Exception {
+
+        if (qaListRepository == null) {
+            throw PopularListExceptionFactory.getServerProblemException("Popular qa list repository should not be null!");
+        }
+
+        if (category == null || category.equals("")) {
+            throw PopularListExceptionFactory.getMissingParamException(
+                    "String: category", "Path", "Query parameter category should not be null or empty");
+        }
+
+        PopularQAList queryList = new PopularQAList()
+                                                .setListCategory(category)
+                                                .setListId(PopularListDocumentId.getPopularQAListId(category));
+
+        PopularQAList result = qaListRepository.readQAList(queryList);
+
+        if (result == null || result.getQaMap() == null) {
+            throw PopularListExceptionFactory.getServerProblemException("Result popular qa list should not be null or have null map!");
+        }
+
+        return PopularQAListResponseFactory.getPopularQAListResponse(result);
     }
 }
