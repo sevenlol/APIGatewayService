@@ -13,7 +13,7 @@ public class FavoriteArticle {
     @Field("article_id") private String articleId;
     @Field("article_title") private String articleTitle;
     @Field("article_created_at") private String articleCreatedAt;
-    @Field("article_category") private String authorCategory;
+    @Field("author_category") private String authorCategory;
     @Field("author_id") private String authorId;
     @Field("author_name") private String authorName;
     @Field("favorite_at") private String favoriteAt;

@@ -18,6 +18,7 @@ public class MongoConfig {
     public static final String WEB_SERVICE_DB_NAME = "web_service_db";
 
     public static final String POPULAR_LIST_COLLECTION_NAME = "popular_list";
+    public static final String FAVORITE_LIST_COLLECTION_NAME = "favorite_list";
 
     @Bean
     public MongoDbFactory webServiceMongoFactory() throws UnknownHostException {
