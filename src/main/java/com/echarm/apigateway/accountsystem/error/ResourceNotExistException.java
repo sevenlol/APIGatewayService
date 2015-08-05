@@ -1,5 +1,9 @@
 package com.echarm.apigateway.accountsystem.error;
 
+import com.echarm.apigateway.popular.error.PopularArticleListNotExistErrorBody;
+import com.echarm.apigateway.popular.error.PopularDoctorListNotExistErrorBody;
+import com.echarm.apigateway.popular.error.PopularQAListNotExistErrorBody;
+
 public class ResourceNotExistException extends Exception implements AttachedErrorBody{
 
 	/**
@@ -22,7 +26,10 @@ public class ResourceNotExistException extends Exception implements AttachedErro
 	public void setErrorBody(ErrorBody body) {
 		// only accept specific errors
 		if (body instanceof CategoryNotExistErrorBody ||
-			body instanceof AccountNotExistErrorBody) {
+			body instanceof AccountNotExistErrorBody ||
+			body instanceof PopularArticleListNotExistErrorBody ||
+			body instanceof PopularDoctorListNotExistErrorBody ||
+			body instanceof PopularQAListNotExistErrorBody) {
 			this.errorBody = body;
 		}
 	}
