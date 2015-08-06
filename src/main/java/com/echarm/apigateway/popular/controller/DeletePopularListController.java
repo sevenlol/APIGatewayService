@@ -43,7 +43,7 @@ public class DeletePopularListController {
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/popular/articles/{category}", method = RequestMethod.DELETE)
-    public IdStatusListResponse updatePopularArticleList(
+    public IdStatusListResponse deletePopularArticleList(
             @PathVariable String category,
             @RequestParam(value = "id_list", required = false) String idList) throws Exception {
 
@@ -91,7 +91,7 @@ public class DeletePopularListController {
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/popular/doctors/{category}", method = RequestMethod.DELETE)
-    public IdStatusListResponse updatePopularDoctorList(
+    public IdStatusListResponse deletePopularDoctorList(
             @PathVariable String category,
             @RequestParam(value = "id_list", required = false) String idList) throws Exception {
 
@@ -137,7 +137,7 @@ public class DeletePopularListController {
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/popular/qas/{category}", method = RequestMethod.DELETE)
-    public IdStatusListResponse updatePopularQAList(
+    public IdStatusListResponse deletePopularQAList(
             @PathVariable String category,
             @RequestParam(value = "id_list", required = false) String idList) throws Exception {
 

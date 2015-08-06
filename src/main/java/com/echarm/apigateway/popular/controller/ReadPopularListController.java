@@ -39,7 +39,7 @@ public class ReadPopularListController {
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/popular/articles/{category}", method = RequestMethod.GET)
-    public List<PopularArticleResponseWrapper> updatePopularArticleList(@PathVariable String category) throws Exception {
+    public List<PopularArticleResponseWrapper> readPopularArticleList(@PathVariable String category) throws Exception {
 
         if (articleListRepository == null) {
             throw PopularListExceptionFactory.getServerProblemException("Popular article list repository should not be null!");
@@ -65,7 +65,7 @@ public class ReadPopularListController {
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/popular/doctors/{category}", method = RequestMethod.GET)
-    public List<PopularDoctorResponseWrapper> updatePopularDoctorList(@PathVariable String category) throws Exception {
+    public List<PopularDoctorResponseWrapper> readPopularDoctorList(@PathVariable String category) throws Exception {
 
         if (doctorListRepository == null) {
             throw PopularListExceptionFactory.getServerProblemException("Popular doctor list repository should not be null!");
@@ -91,7 +91,7 @@ public class ReadPopularListController {
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/popular/qas/{category}", method = RequestMethod.GET)
-    public List<PopularQAResponseWrapper> updatePopularQAList(@PathVariable String category) throws Exception {
+    public List<PopularQAResponseWrapper> readPopularQAList(@PathVariable String category) throws Exception {
 
         if (qaListRepository == null) {
             throw PopularListExceptionFactory.getServerProblemException("Popular qa list repository should not be null!");
