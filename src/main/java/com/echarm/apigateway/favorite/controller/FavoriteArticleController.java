@@ -115,7 +115,8 @@ public class FavoriteArticleController {
         }
 
         FavoriteList queryList = new FavoriteList()
-                                                .setListId(FavoriteListDbUtilities.getFavoriteListId(accountId));
+                                                .setListId(FavoriteListDbUtilities.getFavoriteListId(accountId))
+                                                .setArticleMap(new HashMap<String, FavoriteArticle>());
 
         FavoriteList result = repository.readFavoriteArticle(queryList);
 

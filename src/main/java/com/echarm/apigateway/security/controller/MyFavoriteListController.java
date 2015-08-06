@@ -12,7 +12,7 @@ import com.echarm.apigateway.favorite.repository.FavoriteQARepository;
 import com.echarm.apigateway.favorite.response.FavoriteListResponseWrapper;
 
 @RestController
-public class FavoriteListController {
+public class MyFavoriteListController {
 
     @Autowired
     private FavoriteArticleRepository articleRepository;

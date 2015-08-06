@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Repository;
 
 import com.echarm.apigateway.accountsystem.error.NoContentException;
 import com.echarm.apigateway.accountsystem.error.ResourceNotExistException;
@@ -17,6 +18,7 @@ import com.echarm.apigateway.favorite.model.FavoriteList;
 import com.echarm.apigateway.favorite.model.FavoriteQA;
 import com.echarm.apigateway.favorite.util.FavoriteListDbUtilities;
 
+@Repository
 public class FavoriteQARepositoryImpl implements FavoriteQARepository {
 
     private static final int FAVORITE_COUNT_MAX = 1000;
@@ -92,10 +94,12 @@ public class FavoriteQARepositoryImpl implements FavoriteQARepository {
         // check if the document exists
         Query searchQuery = new Query().addCriteria(Criteria.where("_id").is(list.getListId()));
         if (!mongoTemplate.exists(searchQuery, FavoriteList.class, MongoConfig.FAVORITE_LIST_COLLECTION_NAME)) {
-            // throw resource not exist exception
-            ResourceNotExistException e = new ResourceNotExistException("Favorite qa list does not exist!");
-            e.setErrorBody(new FavoriteListNotExistErrorBody(list.getListId()));
-            throw e;
+            // document not exists, throw no contentexception
+            // TODO check if the account exists, if not throw resource not exist exception
+            throw new NoContentException();
+//            ResourceNotExistException e = new ResourceNotExistException("Favorite qa list does not exist!");
+//            e.setErrorBody(new FavoriteListNotExistErrorBody(list.getListId()));
+//            throw e;
         } else {
             FavoriteList listInDb = mongoTemplate.findOne(searchQuery, FavoriteList.class, MongoConfig.FAVORITE_LIST_COLLECTION_NAME);
             if (listInDb == null || listInDb.getQAMap() == null) {
@@ -220,6 +224,7 @@ public class FavoriteQARepositoryImpl implements FavoriteQARepository {
           .setAnswerId(null)
           .setQuestionCreatedAt(null)
           .setAnswerCreatedAt(null)
+          .setAnswererCategory(null)
           .setAnswererId(null)
           .setAnswererName(null)
           .setAnswerId(null)

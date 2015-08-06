@@ -17,7 +17,7 @@ import com.echarm.apigateway.favorite.response.FavoriteQAResponseWrapper;
 import com.echarm.apigateway.favorite.response.IdStatusListResponse;
 
 @RestController
-public class FavoriteQAController {
+public class MyFavoriteQAController {
 
     @Autowired
     private FavoriteQARepository repository;

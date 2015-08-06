@@ -113,7 +113,8 @@ public class FavoriteQAController {
         }
 
         FavoriteList queryList = new FavoriteList()
-                                                .setListId(FavoriteListDbUtilities.getFavoriteListId(accountId));
+                                                .setListId(FavoriteListDbUtilities.getFavoriteListId(accountId))
+                                                .setQAMap(new HashMap<String, FavoriteQA>());
 
         FavoriteList result = repository.readFavoriteQA(queryList);
 

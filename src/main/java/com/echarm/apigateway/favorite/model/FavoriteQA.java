@@ -94,8 +94,8 @@ public class FavoriteQA {
     }
 
     @JsonIgnore
-    public FavoriteQA setAnswererId(String answererId) {
-        this.answererId = answererId; return this;
+    public FavoriteQA setAnswererId(String answerId) {
+        this.answerId = answerId; return this;
     }
 
     @JsonIgnore
