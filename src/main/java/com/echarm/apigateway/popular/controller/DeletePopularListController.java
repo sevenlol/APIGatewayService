@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.echarm.apigateway.popular.error.PopularListExceptionFactory;
 import com.echarm.apigateway.popular.model.PopularArticle;
 import com.echarm.apigateway.popular.model.PopularArticleList;
 import com.echarm.apigateway.popular.model.PopularDoctor;
@@ -27,6 +26,7 @@ import com.echarm.apigateway.popular.response.PopularArticleListResponseFactory;
 import com.echarm.apigateway.popular.response.PopularDoctorListResponseFactory;
 import com.echarm.apigateway.popular.response.PopularQAListResponseFactory;
 import com.echarm.apigateway.popular.util.PopularListDocumentId;
+import com.echarm.apigateway.security.error.CustomExceptionFactory;
 import com.echarm.apigateway.security.util.CommaDelimitedStringParser;
 
 @RestController
@@ -48,12 +48,12 @@ public class DeletePopularListController {
             @RequestParam(value = "id_list", required = false) String idList) throws Exception {
 
         if (articleListRepository == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Popular article list repository should not be null!");
+            throw CustomExceptionFactory.getServerProblemException("Popular article list repository should not be null!");
         }
 
         // validate JSON body
         if (category == null || category.equals("")) {
-            throw PopularListExceptionFactory.getMissingParamException(
+            throw CustomExceptionFactory.getMissingParamException(
                     "String: category", "Path", "Query parameter category should not be null or empty");
         }
 
@@ -61,7 +61,7 @@ public class DeletePopularListController {
         String[] idArr = CommaDelimitedStringParser.parse(idList);
 
         if (idArr == null || idArr.length == 0) {
-            throw PopularListExceptionFactory.getServerProblemException("Id array should not be null or has size 0!");
+            throw CustomExceptionFactory.getServerProblemException("Id array should not be null or has size 0!");
         }
 
         // create list for delete
@@ -83,7 +83,7 @@ public class DeletePopularListController {
         PopularArticleList result = articleListRepository.deletePopularArticleList(deleteList);
 
         if (result == null || result.getArticleMap() == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Result popular article list should not be null or have null map!");
+            throw CustomExceptionFactory.getServerProblemException("Result popular article list should not be null or have null map!");
         }
 
         return PopularArticleListResponseFactory.getIdStatusListResponse(result);
@@ -96,11 +96,11 @@ public class DeletePopularListController {
             @RequestParam(value = "id_list", required = false) String idList) throws Exception {
 
         if (doctorListRepository == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Popular doctor list repository should not be null!");
+            throw CustomExceptionFactory.getServerProblemException("Popular doctor list repository should not be null!");
         }
 
         if (category == null || category.equals("")) {
-            throw PopularListExceptionFactory.getMissingParamException(
+            throw CustomExceptionFactory.getMissingParamException(
                     "String: category", "Path", "Query parameter category should not be null or empty");
         }
 
@@ -108,7 +108,7 @@ public class DeletePopularListController {
         String[] idArr = CommaDelimitedStringParser.parse(idList);
 
         if (idArr == null || idArr.length == 0) {
-            throw PopularListExceptionFactory.getServerProblemException("Id array should not be null or has size 0!");
+            throw CustomExceptionFactory.getServerProblemException("Id array should not be null or has size 0!");
         }
 
         // create list for delete
@@ -130,7 +130,7 @@ public class DeletePopularListController {
         PopularDoctorList result = doctorListRepository.deleteDoctorList(deleteList);
 
         if (result == null || result.getDoctorMap() == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Result popular doctor list should not be null or have null map!");
+            throw CustomExceptionFactory.getServerProblemException("Result popular doctor list should not be null or have null map!");
         }
         return PopularDoctorListResponseFactory.getIdStatusListResponse(result);
     }
@@ -142,11 +142,11 @@ public class DeletePopularListController {
             @RequestParam(value = "id_list", required = false) String idList) throws Exception {
 
         if (qaListRepository == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Popular qa list repository should not be null!");
+            throw CustomExceptionFactory.getServerProblemException("Popular qa list repository should not be null!");
         }
 
         if (category == null || category.equals("")) {
-            throw PopularListExceptionFactory.getMissingParamException(
+            throw CustomExceptionFactory.getMissingParamException(
                     "String: category", "Path", "Query parameter category should not be null or empty");
         }
 
@@ -154,7 +154,7 @@ public class DeletePopularListController {
         String[] idArr = CommaDelimitedStringParser.parse(idList);
 
         if (idArr == null || idArr.length == 0) {
-            throw PopularListExceptionFactory.getServerProblemException("Id array should not be null or has size 0!");
+            throw CustomExceptionFactory.getServerProblemException("Id array should not be null or has size 0!");
         }
 
         // create list for delete
@@ -176,7 +176,7 @@ public class DeletePopularListController {
         PopularQAList result = qaListRepository.deleteQAList(deleteList);
 
         if (result == null || result.getQaMap() == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Result popular qa list should not be null or have null map!");
+            throw CustomExceptionFactory.getServerProblemException("Result popular qa list should not be null or have null map!");
         }
         return PopularQAListResponseFactory.getIdStatusListResponse(result);
     }

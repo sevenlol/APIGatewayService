@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.echarm.apigateway.popular.error.PopularListExceptionFactory;
 import com.echarm.apigateway.popular.model.PopularArticleList;
 import com.echarm.apigateway.popular.model.PopularDoctorList;
 import com.echarm.apigateway.popular.model.PopularQAList;
@@ -24,6 +23,7 @@ import com.echarm.apigateway.popular.response.PopularDoctorResponseWrapper;
 import com.echarm.apigateway.popular.response.PopularQAListResponseFactory;
 import com.echarm.apigateway.popular.response.PopularQAResponseWrapper;
 import com.echarm.apigateway.popular.util.PopularListDocumentId;
+import com.echarm.apigateway.security.error.CustomExceptionFactory;
 
 @RestController
 public class ReadPopularListController {
@@ -42,11 +42,11 @@ public class ReadPopularListController {
     public List<PopularArticleResponseWrapper> readPopularArticleList(@PathVariable String category) throws Exception {
 
         if (articleListRepository == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Popular article list repository should not be null!");
+            throw CustomExceptionFactory.getServerProblemException("Popular article list repository should not be null!");
         }
 
         if (category == null || category.equals("")) {
-            throw PopularListExceptionFactory.getMissingParamException(
+            throw CustomExceptionFactory.getMissingParamException(
                     "String: category", "Path", "Query parameter category should not be null or empty");
         }
 
@@ -57,7 +57,7 @@ public class ReadPopularListController {
         PopularArticleList result = articleListRepository.readPopularArticleList(queryList);
 
         if (result == null || result.getArticleMap() == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Result popular article list should not be null or have null map!");
+            throw CustomExceptionFactory.getServerProblemException("Result popular article list should not be null or have null map!");
         }
 
         return PopularArticleListResponseFactory.getPopularArticleListResponse(result);
@@ -68,11 +68,11 @@ public class ReadPopularListController {
     public List<PopularDoctorResponseWrapper> readPopularDoctorList(@PathVariable String category) throws Exception {
 
         if (doctorListRepository == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Popular doctor list repository should not be null!");
+            throw CustomExceptionFactory.getServerProblemException("Popular doctor list repository should not be null!");
         }
 
         if (category == null || category.equals("")) {
-            throw PopularListExceptionFactory.getMissingParamException(
+            throw CustomExceptionFactory.getMissingParamException(
                     "String: category", "Path", "Query parameter category should not be null or empty");
         }
 
@@ -83,7 +83,7 @@ public class ReadPopularListController {
         PopularDoctorList result = doctorListRepository.readDoctorList(queryList);
 
         if (result == null || result.getDoctorMap() == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Result popular doctor list should not be null or have null map!");
+            throw CustomExceptionFactory.getServerProblemException("Result popular doctor list should not be null or have null map!");
         }
 
         return PopularDoctorListResponseFactory.getPopularDoctorListResponse(result);
@@ -94,11 +94,11 @@ public class ReadPopularListController {
     public List<PopularQAResponseWrapper> readPopularQAList(@PathVariable String category) throws Exception {
 
         if (qaListRepository == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Popular qa list repository should not be null!");
+            throw CustomExceptionFactory.getServerProblemException("Popular qa list repository should not be null!");
         }
 
         if (category == null || category.equals("")) {
-            throw PopularListExceptionFactory.getMissingParamException(
+            throw CustomExceptionFactory.getMissingParamException(
                     "String: category", "Path", "Query parameter category should not be null or empty");
         }
 
@@ -109,7 +109,7 @@ public class ReadPopularListController {
         PopularQAList result = qaListRepository.readQAList(queryList);
 
         if (result == null || result.getQaMap() == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Result popular qa list should not be null or have null map!");
+            throw CustomExceptionFactory.getServerProblemException("Result popular qa list should not be null or have null map!");
         }
 
         return PopularQAListResponseFactory.getPopularQAListResponse(result);

@@ -1,11 +1,11 @@
-package com.echarm.apigateway.popular.error;
+package com.echarm.apigateway.security.error;
 
 import com.echarm.apigateway.accountsystem.error.EmptyParameterErrorBody;
 import com.echarm.apigateway.accountsystem.error.InvalidParameterException;
 import com.echarm.apigateway.accountsystem.error.MissingParameterErrorBody;
 import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 
-public class PopularListExceptionFactory {
+public class CustomExceptionFactory {
 
     public static Exception getMissingParamException(String obj, String in, String msg) {
         MissingParameterErrorBody body = new MissingParameterErrorBody(MissingParameterErrorBody.generateDescription(obj, in));

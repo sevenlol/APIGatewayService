@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.echarm.apigateway.popular.error.PopularListExceptionFactory;
 import com.echarm.apigateway.popular.model.PopularArticle;
 import com.echarm.apigateway.popular.model.PopularArticleList;
 import com.echarm.apigateway.popular.model.PopularDoctor;
@@ -37,6 +36,7 @@ import com.echarm.apigateway.popular.util.PopularDoctorValidatorFactory;
 import com.echarm.apigateway.popular.util.PopularListDocumentId;
 import com.echarm.apigateway.popular.util.PopularQAValidator;
 import com.echarm.apigateway.popular.util.PopularQAValidatorFactory;
+import com.echarm.apigateway.security.error.CustomExceptionFactory;
 
 @RestController
 public class CreatePopularListController {
@@ -57,21 +57,21 @@ public class CreatePopularListController {
             @PathVariable String category) throws Exception {
 
         if (articleListRepository == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Popular article list repository should not be null!");
+            throw CustomExceptionFactory.getServerProblemException("Popular article list repository should not be null!");
         }
 
         // validate JSON body
         if (category == null || category.equals("")) {
-            throw PopularListExceptionFactory.getMissingParamException(
+            throw CustomExceptionFactory.getMissingParamException(
                     "String: category", "Path", "Query parameter category should not be null or empty");
         }
 
         if (articleList == null) {
-            throw PopularListExceptionFactory.getMissingParamException(
+            throw CustomExceptionFactory.getMissingParamException(
                     "JSON: popular article list", "Body", "JSON body should not be null");
         }
         if (articleList.size() == 0) {
-            throw PopularListExceptionFactory.getEmptyParamException(
+            throw CustomExceptionFactory.getEmptyParamException(
                     "JSON: popular article list", "Body", "JSON body should not be empty");
         }
 
@@ -84,7 +84,7 @@ public class CreatePopularListController {
         Map<String, PopularArticle> createMap = new HashMap<String, PopularArticle>();
         for (PopularArticleRequestWrapper wrapper : articleList) {
             if (wrapper == null || wrapper.getPopularArticle() == null) {
-                throw PopularListExceptionFactory.getMissingParamException(
+                throw CustomExceptionFactory.getMissingParamException(
                         "JSON Object: popular article",
                         "JSON Array in Body",
                         "Popular article object in body should not be null!");
@@ -92,14 +92,14 @@ public class CreatePopularListController {
 
             PopularArticle article = wrapper.getPopularArticle();
             if (!nonNullValidator.validate(article)) {
-                throw PopularListExceptionFactory.getMissingParamException(
+                throw CustomExceptionFactory.getMissingParamException(
                         "JSON Object: popular article",
                         "JSON Array in Body",
                         "Popular article object in body contains null fields!");
             }
 
             if (!nonEmptyValidator.validate(article)) {
-                throw PopularListExceptionFactory.getEmptyParamException(
+                throw CustomExceptionFactory.getEmptyParamException(
                         "JSON Object: popular article",
                         "JSON Array in Body",
                         "Popular article object in body contains empty fields!");
@@ -112,7 +112,7 @@ public class CreatePopularListController {
         PopularArticleList result = articleListRepository.createPopularArticleList(createList);
 
         if (result == null || result.getArticleMap() == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Result popular article list should not be null or have null map!");
+            throw CustomExceptionFactory.getServerProblemException("Result popular article list should not be null or have null map!");
         }
 
         // create response
@@ -126,20 +126,20 @@ public class CreatePopularListController {
             @PathVariable String category) throws Exception {
 
         if (doctorListRepository == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Popular doctor list repository should not be null!");
+            throw CustomExceptionFactory.getServerProblemException("Popular doctor list repository should not be null!");
         }
 
         if (category == null || category.equals("")) {
-            throw PopularListExceptionFactory.getMissingParamException(
+            throw CustomExceptionFactory.getMissingParamException(
                     "String: category", "Path", "Query parameter category should not be null or empty");
         }
 
         if (doctorList == null) {
-            throw PopularListExceptionFactory.getMissingParamException(
+            throw CustomExceptionFactory.getMissingParamException(
                     "JSON: popular doctor list", "Body", "JSON body should not be null");
         }
         if (doctorList.size() == 0) {
-            throw PopularListExceptionFactory.getEmptyParamException(
+            throw CustomExceptionFactory.getEmptyParamException(
                     "JSON: popular doctor list", "Body", "JSON body should not be empty");
         }
 
@@ -149,7 +149,7 @@ public class CreatePopularListController {
         Map<String, PopularDoctor> createMap = new HashMap<String, PopularDoctor>();
         for (PopularDoctorRequestWrapper wrapper : doctorList) {
             if (wrapper == null || wrapper.getPopularDoctor() == null) {
-                throw PopularListExceptionFactory.getMissingParamException(
+                throw CustomExceptionFactory.getMissingParamException(
                         "JSON Object: popular doctor",
                         "JSON Array in Body",
                         "Popular doctor object in body should not be null!");
@@ -157,14 +157,14 @@ public class CreatePopularListController {
 
             PopularDoctor doctor = wrapper.getPopularDoctor();
             if (!nonNullValidator.validate(doctor)) {
-                throw PopularListExceptionFactory.getMissingParamException(
+                throw CustomExceptionFactory.getMissingParamException(
                         "JSON Object: popular doctor",
                         "JSON Array in Body",
                         "Popular doctor object in body contains null fields!");
             }
 
             if (!nonEmptyValidator.validate(doctor)) {
-                throw PopularListExceptionFactory.getEmptyParamException(
+                throw CustomExceptionFactory.getEmptyParamException(
                         "JSON Object: popular doctor",
                         "JSON Array in Body",
                         "Popular doctor object in body contains empty fields!");
@@ -180,7 +180,7 @@ public class CreatePopularListController {
         PopularDoctorList result = doctorListRepository.createDoctorList(createList);
 
         if (result == null || result.getDoctorMap() == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Result popular doctor list should not be null or have null map!");
+            throw CustomExceptionFactory.getServerProblemException("Result popular doctor list should not be null or have null map!");
         }
 
         return PopularDoctorListResponseFactory.getIdStatusListResponse(result);
@@ -193,20 +193,20 @@ public class CreatePopularListController {
             @PathVariable String category) throws Exception {
 
         if (qaListRepository == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Popular qa list repository should not be null!");
+            throw CustomExceptionFactory.getServerProblemException("Popular qa list repository should not be null!");
         }
 
         if (category == null || category.equals("")) {
-            throw PopularListExceptionFactory.getMissingParamException(
+            throw CustomExceptionFactory.getMissingParamException(
                     "String: category", "Path", "Query parameter category should not be null or empty");
         }
 
         if (qaList == null) {
-            throw PopularListExceptionFactory.getMissingParamException(
+            throw CustomExceptionFactory.getMissingParamException(
                     "JSON: popular qa list", "Body", "JSON body should not be null");
         }
         if (qaList.size() == 0) {
-            throw PopularListExceptionFactory.getEmptyParamException(
+            throw CustomExceptionFactory.getEmptyParamException(
                     "JSON: popular qa list", "Body", "JSON body should not be empty");
         }
 
@@ -216,7 +216,7 @@ public class CreatePopularListController {
         Map<String, PopularQA> createMap = new HashMap<String, PopularQA>();
         for (PopularQARequestWrapper wrapper : qaList) {
             if (wrapper == null || wrapper.getPopularQA() == null) {
-                throw PopularListExceptionFactory.getMissingParamException(
+                throw CustomExceptionFactory.getMissingParamException(
                         "JSON Object: popular qa",
                         "JSON Array in Body",
                         "Popular qa object in body should not be null!");
@@ -224,14 +224,14 @@ public class CreatePopularListController {
 
             PopularQA qa = wrapper.getPopularQA();
             if (!nonNullValidator.validate(qa)) {
-                throw PopularListExceptionFactory.getMissingParamException(
+                throw CustomExceptionFactory.getMissingParamException(
                         "JSON Object: popular qa",
                         "JSON Array in Body",
                         "Popular qa object in body contains null fields!");
             }
 
             if (!nonEmptyValidator.validate(qa)) {
-                throw PopularListExceptionFactory.getEmptyParamException(
+                throw CustomExceptionFactory.getEmptyParamException(
                         "JSON Object: popular qa",
                         "JSON Array in Body",
                         "Popular qa object in body contains empty fields!");
@@ -247,7 +247,7 @@ public class CreatePopularListController {
         PopularQAList result = qaListRepository.createQAList(createList);
 
         if (result == null || result.getQaMap() == null) {
-            throw PopularListExceptionFactory.getServerProblemException("Result popular qa list should not be null or have null map!");
+            throw CustomExceptionFactory.getServerProblemException("Result popular qa list should not be null or have null map!");
         }
 
         return PopularQAListResponseFactory.getIdStatusListResponse(result);
