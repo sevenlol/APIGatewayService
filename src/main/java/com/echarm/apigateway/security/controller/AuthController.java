@@ -97,8 +97,6 @@ public class AuthController {
 
                 Account resultAccount = results.get(0);
 
-                System.out.println(resultAccount.getUserInfo().getAddress());
-
                 resultAccount.setPassword(null);
                 resultAccount.setSalt(null);
 
