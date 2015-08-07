@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.echarm.apigateway.accountsystem.error.NoContentException;
 import com.echarm.apigateway.favorite.model.FavoriteArticle;
 import com.echarm.apigateway.favorite.model.FavoriteList;
 import com.echarm.apigateway.favorite.model.FavoriteQA;
@@ -57,10 +58,15 @@ public class MyFavoriteListController {
                                                 .setListId(FavoriteListDbUtilities.getFavoriteListId(accountId))
                                                 .setArticleMap(new HashMap<String, FavoriteArticle>());
 
-        FavoriteList articleResult = articleRepository.readFavoriteArticle(articleQueryList);
+        FavoriteList articleResult = null;
+        try {
+            articleResult = articleRepository.readFavoriteArticle(articleQueryList);
 
-        if (articleResult == null || articleResult.getArticleMap() == null) {
-            throw CustomExceptionFactory.getServerProblemException("Result favorite article list should not be null or have null map!");
+            if (articleResult == null || articleResult.getArticleMap() == null) {
+                throw CustomExceptionFactory.getServerProblemException("Result favorite article list should not be null or have null map!");
+            }
+        } catch (NoContentException e) {
+
         }
 
         /*
@@ -81,10 +87,15 @@ public class MyFavoriteListController {
                                                 .setListId(FavoriteListDbUtilities.getFavoriteListId(accountId))
                                                 .setQAMap(new HashMap<String, FavoriteQA>());
 
-        FavoriteList qaResult = qaRepository.readFavoriteQA(qaQueryList);
+        FavoriteList qaResult = null;
+        try {
+            qaResult = qaRepository.readFavoriteQA(qaQueryList);
 
-        if (qaResult == null || qaResult.getQAMap() == null) {
-            throw CustomExceptionFactory.getServerProblemException("Result favorite qa list should not be null or have null map!");
+            if (qaResult == null || qaResult.getQAMap() == null) {
+                throw CustomExceptionFactory.getServerProblemException("Result favorite qa list should not be null or have null map!");
+            }
+        } catch (NoContentException e) {
+
         }
 
         return FavoriteListResponseFactory.getFavoriteListRespones(articleResult, qaResult);

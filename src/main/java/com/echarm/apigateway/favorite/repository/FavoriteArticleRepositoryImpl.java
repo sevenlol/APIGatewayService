@@ -102,11 +102,11 @@ public class FavoriteArticleRepositoryImpl implements FavoriteArticleRepository 
 //            throw e;
         } else {
             FavoriteList listInDb = mongoTemplate.findOne(searchQuery, FavoriteList.class, MongoConfig.FAVORITE_LIST_COLLECTION_NAME);
-            if (listInDb == null || listInDb.getArticleMap() == null) {
+            if (listInDb == null) {
                 // not suppose to happen
-                throw new ServerSideProblemException("Document found or input article list should not be null!");
+                throw new ServerSideProblemException("List should not be null!");
             } else {
-                if (listInDb.getArticleMap().size() == 0) {
+                if (listInDb.getArticleMap() == null || listInDb.getArticleMap().size() == 0) {
                     throw new NoContentException();
                 }
                 return listInDb;

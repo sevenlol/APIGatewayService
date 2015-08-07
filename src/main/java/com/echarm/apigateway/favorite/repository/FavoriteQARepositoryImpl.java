@@ -102,11 +102,11 @@ public class FavoriteQARepositoryImpl implements FavoriteQARepository {
 //            throw e;
         } else {
             FavoriteList listInDb = mongoTemplate.findOne(searchQuery, FavoriteList.class, MongoConfig.FAVORITE_LIST_COLLECTION_NAME);
-            if (listInDb == null || listInDb.getQAMap() == null) {
+            if (listInDb == null) {
                 // not suppose to happen
-                throw new ServerSideProblemException("Document found or input qa list should not be null!");
+                throw new ServerSideProblemException("List should not be null!");
             } else {
-                if (listInDb.getQAMap().size() == 0) {
+                if ( listInDb.getQAMap() == null || listInDb.getQAMap().size() == 0) {
                     throw new NoContentException();
                 }
                 return listInDb;

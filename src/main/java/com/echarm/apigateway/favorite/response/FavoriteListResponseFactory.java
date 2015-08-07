@@ -11,17 +11,28 @@ import com.echarm.apigateway.favorite.model.FavoriteQA;
 public class FavoriteListResponseFactory {
 
     public static FavoriteListResponseWrapper getFavoriteListRespones(FavoriteList articleList, FavoriteList qaList) {
-        Map<String, FavoriteArticle> articleMap = articleList.getArticleMap();
-        Map<String, FavoriteQA> qaMap = qaList.getQAMap();
 
-        List<FavoriteArticleResponseWrapper> articleWrapperList = new ArrayList<FavoriteArticleResponseWrapper>();
-        List<FavoriteQAResponseWrapper> qaWrapperList = new ArrayList<FavoriteQAResponseWrapper>();
-        for (String key : articleMap.keySet()) {
-            articleWrapperList.add(new FavoriteArticleResponseWrapper(articleMap.get(key)));
+
+
+        List<FavoriteArticleResponseWrapper> articleWrapperList = null;
+        List<FavoriteQAResponseWrapper> qaWrapperList = null;
+
+        if (articleList != null) {
+            articleWrapperList = new ArrayList<FavoriteArticleResponseWrapper>();
+            Map<String, FavoriteArticle> articleMap = articleList.getArticleMap();
+            for (String key : articleMap.keySet()) {
+                articleWrapperList.add(new FavoriteArticleResponseWrapper(articleMap.get(key)));
+            }
         }
-        for (String key : qaMap.keySet()) {
-            qaWrapperList.add(new FavoriteQAResponseWrapper(qaMap.get(key)));
+
+        if (qaList != null) {
+            qaWrapperList = new ArrayList<FavoriteQAResponseWrapper>();
+            Map<String, FavoriteQA> qaMap = qaList.getQAMap();
+            for (String key : qaMap.keySet()) {
+                qaWrapperList.add(new FavoriteQAResponseWrapper(qaMap.get(key)));
+            }
         }
+
         return new FavoriteListResponseWrapper().setArticleList(articleWrapperList).setQAList(qaWrapperList);
     }
 }
