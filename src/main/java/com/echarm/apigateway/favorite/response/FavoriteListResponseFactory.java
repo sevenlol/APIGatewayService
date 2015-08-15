@@ -12,8 +12,6 @@ public class FavoriteListResponseFactory {
 
     public static FavoriteListResponseWrapper getFavoriteListRespones(FavoriteList articleList, FavoriteList qaList) {
 
-
-
         List<FavoriteArticleResponseWrapper> articleWrapperList = null;
         List<FavoriteQAResponseWrapper> qaWrapperList = null;
 
