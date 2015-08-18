@@ -235,6 +235,10 @@ public class DoctorInfo extends UserInfo{
     		fieldList.add("Specialty");
     	if(availableTime != null)
     		fieldList.add("AvailableTime");
+    	if (facebookAccount != null)
+    	    fieldList.add("FacebookAccount");
+    	if (blogUrl != null)
+    	    fieldList.add("BlogUrl");
 
     	if(fieldList.isEmpty())
     		return null;
