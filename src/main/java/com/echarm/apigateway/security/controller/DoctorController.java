@@ -3,6 +3,8 @@ package com.echarm.apigateway.security.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.mail.MessagingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,9 +32,11 @@ import com.echarm.apigateway.accountsystem.repository.AccountSpecificationFactor
 import com.echarm.apigateway.accountsystem.util.AccountFieldChecker;
 import com.echarm.apigateway.accountsystem.util.Category;
 import com.echarm.apigateway.accountsystem.util.DoctorInfoFieldChecker;
+import com.echarm.apigateway.accountsystem.util.EmailSender;
 import com.echarm.apigateway.accountsystem.util.UserType;
 import com.echarm.apigateway.security.service.UserDetailsImpl;
 import com.echarm.apigateway.security.util.CommaDelimitedStringParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 @RestController
 public class DoctorController {
@@ -210,7 +214,7 @@ public class DoctorController {
     }
 
 	@RequestMapping(value = "/members/doctors", method = RequestMethod.POST)
-	public DoctorAccount registerDoctor(@RequestBody(required=false) DoctorAccount account) throws InvalidParameterException {
+	public DoctorAccount registerDoctor(@RequestBody(required=false) DoctorAccount account) throws InvalidParameterException, JsonProcessingException, MessagingException {
 
 		// Check Input Account
 		AccountFieldChecker accountChecker = new AccountFieldChecker(AccountFieldChecker.ConnectType.ALL_PASS);
@@ -256,6 +260,8 @@ public class DoctorController {
 		}
 
 		// TODO send a mail to E-Charm's email account
+		// Send an email to administrator
+        EmailSender.sendDoctorRegistrationEmail(account);
 
 		return null;
 	}

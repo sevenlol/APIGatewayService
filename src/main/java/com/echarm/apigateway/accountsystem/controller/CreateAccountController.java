@@ -19,7 +19,6 @@ import com.echarm.apigateway.accountsystem.model.UserAccount;
 import com.echarm.apigateway.accountsystem.repository.AccountRepositoryService;
 import com.echarm.apigateway.accountsystem.util.Category;
 import com.echarm.apigateway.accountsystem.util.ControllerUtil;
-import com.echarm.apigateway.accountsystem.util.EmailSender;
 
 @RestController
 public class CreateAccountController {
@@ -106,9 +105,9 @@ public class CreateAccountController {
         }
 
         // TODO account fields check
-        
+
         // Send an email to administrator
-        EmailSender.sendDoctorRegistrationEmail(result);
+//        EmailSender.sendDoctorRegistrationEmail(result);
 
         return result;
     }
