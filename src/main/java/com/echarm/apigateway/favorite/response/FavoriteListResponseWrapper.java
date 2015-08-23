@@ -16,7 +16,7 @@ public class FavoriteListResponseWrapper {
 
     /* getter methods */
 
-    @JsonProperty("favirote_articles")
+    @JsonProperty("favorite_articles")
     public List<FavoriteArticleResponseWrapper> getArticleList() {
         return articleList;
     }
