@@ -13,8 +13,8 @@ import com.echarm.apigateway.accountsystem.error.ResourceNotExistException;
 import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.accountsystem.model.Account;
 import com.echarm.apigateway.accountsystem.util.AccountType;
+import com.echarm.apigateway.accountsystem.util.IdGenerationService;
 import com.echarm.apigateway.accountsystem.util.QueryFactory;
-import com.echarm.apigateway.accountsystem.util.Time;
 import com.echarm.apigateway.accountsystem.util.UserType;
 
 public class CreateAccountBasicSpecification extends AccountBasicSpecification {
@@ -63,7 +63,11 @@ public class CreateAccountBasicSpecification extends AccountBasicSpecification {
 		// preserve accountId for FB implicit sign up
 		// generate a new one otherwise
 		if (AccountType.FACEBOOK != account.getAccountType() || account.getAccountId() == null) {
-		    account.setAccountId(Time.getCurrentTimeMillisStr());
+		    String accountId = IdGenerationService.generateAccountId(account);
+		    if (accountId == null) {
+		        throw new ServerSideProblemException("Generate account id failed!");
+		    }
+		    account.setAccountId(accountId);
 		} else {
 		    // check if the accountId already exist
 		    Query searchFBAccQuery = new Query();
