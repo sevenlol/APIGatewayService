@@ -138,8 +138,8 @@ public class DoctorController {
 		}
 
 		if (category == null) {
-		    ResourceNotExistException exception = new ResourceNotExistException("Category "+category.toString()+" Not Exist!");
-            exception.setErrorBody(new CategoryNotExistErrorBody(category.toString()));
+		    ResourceNotExistException exception = new ResourceNotExistException("Category "+categoryStr+" Not Exist!");
+            exception.setErrorBody(new CategoryNotExistErrorBody(categoryStr));
             throw exception;
 		}
 
