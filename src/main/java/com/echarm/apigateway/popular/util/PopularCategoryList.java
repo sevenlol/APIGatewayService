@@ -10,7 +10,7 @@ public class PopularCategoryList {
     }
 
     public static enum DoctorCategory {
-        PGY, plasticsurgeon, cosmeticsurgeon, dermatologist, OBSGYN, pediatrics, others;
+        PGY, plasticsurgeon, cosmeticsurgeon, dermatologist, OBSGYN, pediatrician, others;
     }
 
     public static enum QACategory {

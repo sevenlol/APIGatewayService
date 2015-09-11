@@ -1,7 +1,7 @@
 package com.echarm.apigateway.accountsystem.util;
 
 public enum Category {
-    PGY, plasticsurgeon, cosmeticsurgeon, dermatologist, OBSGYN, pediatrics, others,
+    PGY, plasticsurgeon, cosmeticsurgeon, dermatologist, OBSGYN, pediatrician, others,
 	Arbitrary;
 
 	public static Category isCategoryExist(String category) {
