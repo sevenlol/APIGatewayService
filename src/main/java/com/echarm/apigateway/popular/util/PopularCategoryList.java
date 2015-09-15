@@ -6,14 +6,15 @@ package com.echarm.apigateway.popular.util;
 public class PopularCategoryList {
 
     public static enum ArticleCategory {
-        cosmeticsurgery, plasticsurgery, gynecology, obstetrics, dermatology, pediatrics, others;
+        cosmeticsurgery, plasticsurgery, gynecology, obstetrics, dermatology, pediatrics, oncology_consultation, others;
     }
 
     public static enum DoctorCategory {
-        PGY, plasticsurgeon, cosmeticsurgeon, dermatologist, OBSGYN, pediatrician, others;
+        PGY, plasticsurgeon, cosmeticsurgeon, dermatologist, OBSGYN, pediatrician,
+        occupational_therapist, physical_therapist, pharmacist, nutritionist, oncologist, others;
     }
 
     public static enum QACategory {
-        cosmeticsurgery, plasticsurgery, gynecology, obstetrics, dermatology, pediatrics, others;
+        cosmeticsurgery, plasticsurgery, gynecology, obstetrics, dermatology, pediatrics, oncology_consultation, others;
     }
 }
