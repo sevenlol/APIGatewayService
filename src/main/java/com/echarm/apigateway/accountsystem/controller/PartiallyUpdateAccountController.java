@@ -1,6 +1,7 @@
 package com.echarm.apigateway.accountsystem.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +37,13 @@ public class PartiallyUpdateAccountController {
 
         // set accountId
         account.setAccountId(accountId);
+
+        // if password is not null
+        if (account.getPassword() != null) {
+            // encode password
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            account.setPassword(encoder.encode(account.getPassword()));
+        }
 
         // partially update the user account
         // when Account with {accountId} doesn't exist, ResourceNotExistException will be thrown with AccountNotExistErrorBody
@@ -73,6 +81,13 @@ public class PartiallyUpdateAccountController {
         account.getUserInfo().setCategory(Category.valueOf(category));
         account.setAccountId(accountId);
 
+        // if password is not null
+        if (account.getPassword() != null) {
+            // encode password
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            account.setPassword(encoder.encode(account.getPassword()));
+        }
+
         // partially update the user account
         // when Account with {accountId} doesn't exist, ResourceNotExistException will be thrown with AccountNotExistErrorBody
         // when the updated Account is exactly the same as the input Account, NoContentException is thrown
@@ -106,6 +121,13 @@ public class PartiallyUpdateAccountController {
 
         // set accountId
         account.setAccountId(accountId);
+
+        // if password is not null
+        if (account.getPassword() != null) {
+            // encode password
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            account.setPassword(encoder.encode(account.getPassword()));
+        }
 
         // partially update the user account
         // when Account with {accountId} doesn't exist, ResourceNotExistException will be thrown with AccountNotExistErrorBody
