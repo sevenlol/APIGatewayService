@@ -1,5 +1,7 @@
 package com.echarm.apigateway.security.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,8 +19,12 @@ import com.echarm.apigateway.accountsystem.model.DoctorAccount;
 import com.echarm.apigateway.accountsystem.model.DoctorInfo;
 import com.echarm.apigateway.accountsystem.model.UserAccount;
 import com.echarm.apigateway.accountsystem.repository.AccountRepositoryService;
+import com.echarm.apigateway.accountsystem.repository.AccountSpecification;
+import com.echarm.apigateway.accountsystem.repository.FindAccountByUserNameSpecification;
 import com.echarm.apigateway.accountsystem.util.Category;
+import com.echarm.apigateway.accountsystem.util.UserType;
 import com.echarm.apigateway.security.service.UserDetailsImpl;
+import com.echarm.apigateway.security.util.RandomStringGenerator;
 
 @RestController
 public class AccountCredentialController {
@@ -27,8 +33,70 @@ public class AccountCredentialController {
     private AccountRepositoryService repository;
 
     @RequestMapping(value = "/me/reset_password", method = RequestMethod.POST)
-    public Account resetMyPassword(Authentication auth) {
-        return null;
+    public Account resetMyPassword(
+            @RequestBody(required = false) Account account) throws Exception {
+
+        // repository null, server error
+        if (repository == null) {
+            throw new ServerSideProblemException("repository null");
+        }
+
+        if (account == null) {
+            MissingParameterErrorBody body = new MissingParameterErrorBody(MissingParameterErrorBody.generateDescription("Json Object: Account", "body"));
+            InvalidParameterException exception = new InvalidParameterException("No Json Body in the Request!");
+            exception.setErrorBody(body);
+            throw exception;
+        }
+
+        if (account.getUserName() == null ||
+            account.getEmail() == null) {
+            MissingParameterErrorBody body = new MissingParameterErrorBody(MissingParameterErrorBody.generateDescription("Username or Email", "Json Object: Account"));
+            InvalidParameterException exception = new InvalidParameterException("No Username or Email in Json Body!");
+            exception.setErrorBody(body);
+            throw exception;
+        }
+
+        Account searchAccount = new Account();
+        searchAccount.setUserName(account.getUserName());
+        searchAccount.setUserType(UserType.ARBITRARY);
+
+        AccountSpecification spec = new FindAccountByUserNameSpecification(searchAccount);
+
+        List<Account> results = repository.query(spec);
+
+        if (results == null) {
+            throw new ServerSideProblemException("results should not be null");
+        }
+        if (results.size() != 1) {
+            throw new ServerSideProblemException("results should have size 1");
+        }
+        if (results.get(0) == null || results.get(0).getAccountId() == null) {
+            throw new ServerSideProblemException("result account should not be null or have null id");
+        }
+
+        String newPassword = RandomStringGenerator.getString(12);
+
+        // TODO send a email with the new password
+
+        Account updateAccount = getUpdateAccount(results.get(0));
+
+        updateAccount.setAccountId(results.get(0).getAccountId());
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        updateAccount.setPassword(encoder.encode(newPassword));
+
+        Account result = repository.updateAccount(updateAccount);
+
+        // result null, server error
+        if (result == null) {
+            throw new ServerSideProblemException("The result from repository should not be null");
+        }
+
+        System.out.println("New password: " + newPassword);
+
+        // only respond with accountId
+        Account resAccount = new Account();
+        resAccount.setAccountId(result.getAccountId());
+        return resAccount;
     }
 
     @RequestMapping(value = "/me/password", method = RequestMethod.PUT)
@@ -67,7 +135,7 @@ public class AccountCredentialController {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         updateAccount.setPassword(encoder.encode(account.getPassword()));
 
-        Account result = repository.updateAccount(account);
+        Account result = repository.updateAccount(updateAccount);
 
         // result null, server error
         if (result == null) {
@@ -111,7 +179,7 @@ public class AccountCredentialController {
         updateAccount.setAccountId(currUserAccount.getAccountId());
         updateAccount.setEmail(account.getEmail());
 
-        Account result = repository.updateAccount(account);
+        Account result = repository.updateAccount(updateAccount);
 
         // result null, server error
         if (result == null) {

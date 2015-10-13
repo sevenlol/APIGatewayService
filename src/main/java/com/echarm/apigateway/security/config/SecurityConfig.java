@@ -96,6 +96,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
             .authorizeRequests().antMatchers(HttpMethod.PUT, "/favorite/me/**").authenticated()
         .and()
             .authorizeRequests().antMatchers(HttpMethod.DELETE, "/favorite/me/**").authenticated()
+        .and()
+            .authorizeRequests().antMatchers(HttpMethod.POST, "/me/reset_password").permitAll()
+        .and()
+            .authorizeRequests().antMatchers(HttpMethod.PUT, "/me/**").authenticated()
 	    .and()
             .apply(getSpringSocialConfigurer())
         .and().logout();
