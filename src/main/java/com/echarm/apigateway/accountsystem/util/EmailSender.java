@@ -49,4 +49,39 @@ public class EmailSender {
 		ctx.close();
 	}
 
+	public static void sendPasswordChangedEmail(String username, String newPassword, String email) throws MessagingException {
+
+	    if (email == null || username == null || newPassword == null) {
+	        throw new MessagingException("Null email address or username or password!");
+	    }
+
+	    AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+        ctx.register(SMTPConfig.class);
+        ctx.refresh();
+        JavaMailSenderImpl mailSender = ctx.getBean(JavaMailSenderImpl.class);
+        MailAccount mailAccount = ctx.getBean(MailAccount.class);
+        if (mailSender == null || mailAccount == null) {
+            System.out.println("---Get mail sender/account failed---");
+            ctx.close();
+            return;
+        }
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper mailMsg = new MimeMessageHelper(mimeMessage);
+        mailMsg.setFrom(mailAccount.getAddress());
+        mailMsg.setTo(email);
+        mailMsg.setSubject("[ECharm] Password Reset Successfully!");
+
+        StringBuilder builder = new StringBuilder();
+        builder
+            .append(String.format("Username: %s\n", username))
+            .append(String.format("New Password: %s\n", newPassword));
+        String mailText = builder.toString();
+
+        mailMsg.setText(mailText);
+        mailSender.send(mimeMessage);
+        System.out.println("---Done---");
+
+        ctx.close();
+	}
 }

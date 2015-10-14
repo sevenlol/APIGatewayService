@@ -22,6 +22,7 @@ import com.echarm.apigateway.accountsystem.repository.AccountRepositoryService;
 import com.echarm.apigateway.accountsystem.repository.AccountSpecification;
 import com.echarm.apigateway.accountsystem.repository.FindAccountByUserNameSpecification;
 import com.echarm.apigateway.accountsystem.util.Category;
+import com.echarm.apigateway.accountsystem.util.EmailSender;
 import com.echarm.apigateway.accountsystem.util.UserType;
 import com.echarm.apigateway.security.service.UserDetailsImpl;
 import com.echarm.apigateway.security.util.RandomStringGenerator;
@@ -73,10 +74,20 @@ public class AccountCredentialController {
         if (results.get(0) == null || results.get(0).getAccountId() == null) {
             throw new ServerSideProblemException("result account should not be null or have null id");
         }
+        if (!account.getEmail().equalsIgnoreCase(results.get(0).getEmail())) {
+            MissingParameterErrorBody body = new MissingParameterErrorBody(MissingParameterErrorBody.generateDescription("Username or Email not matched", "Json Object: Account"));
+            InvalidParameterException exception = new InvalidParameterException("Username or Email not matched in Json Body!");
+            exception.setErrorBody(body);
+            throw exception;
+        }
 
         String newPassword = RandomStringGenerator.getString(12);
 
-        // TODO send a email with the new password
+        try {
+            EmailSender.sendPasswordChangedEmail(account.getUserName(), newPassword, account.getEmail());
+        } catch (Exception e) {
+            throw new ServerSideProblemException("Send mail failed");
+        }
 
         Account updateAccount = getUpdateAccount(results.get(0));
 
@@ -90,8 +101,6 @@ public class AccountCredentialController {
         if (result == null) {
             throw new ServerSideProblemException("The result from repository should not be null");
         }
-
-        System.out.println("New password: " + newPassword);
 
         // only respond with accountId
         Account resAccount = new Account();
