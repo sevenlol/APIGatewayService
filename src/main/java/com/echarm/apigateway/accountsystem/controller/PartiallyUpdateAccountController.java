@@ -12,6 +12,7 @@ import com.echarm.apigateway.accountsystem.error.ServerSideProblemException;
 import com.echarm.apigateway.accountsystem.model.Account;
 import com.echarm.apigateway.accountsystem.model.AdminAccount;
 import com.echarm.apigateway.accountsystem.model.DoctorAccount;
+import com.echarm.apigateway.accountsystem.model.DoctorInfo;
 import com.echarm.apigateway.accountsystem.model.UserAccount;
 import com.echarm.apigateway.accountsystem.repository.AccountRepositoryService;
 import com.echarm.apigateway.accountsystem.util.Category;
@@ -78,7 +79,13 @@ public class PartiallyUpdateAccountController {
         ControllerUtil.checkRequestInput(true, false, account, true, false, category);
 
         // set category and accountId
-        account.getUserInfo().setCategory(Category.valueOf(category));
+        if (account.getUserInfo() == null) {
+            DoctorInfo info = new DoctorInfo();
+            info.setCategory(Category.valueOf(category));
+            account.setUserInfo(info);
+        } else {
+            account.getUserInfo().setCategory(Category.valueOf(category));
+        }
         account.setAccountId(accountId);
 
         // if password is not null
