@@ -13,4 +13,6 @@ public interface ObjectManagementService {
     public byte[] download(String key);
 
     public List<ObjectSummary> list();
+
+    public ObjectSummary delete(String key);
 }
