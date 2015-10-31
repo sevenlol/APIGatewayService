@@ -31,27 +31,20 @@ public class AWSS3ObjectManager implements ObjectManagementService {
 
     @Autowired
     private AmazonS3Client amazonS3Client;
-    private String bucket;
 
     public AWSS3ObjectManager() {}
 
-    public String getBucket() { return bucket; }
-
-    public AWSS3ObjectManager setBucket(String bucket) {
-        this.bucket = bucket; return this;
-    }
-
     @Override
-    public List<ObjectSummary> upload(MultipartFile[] files) {
+    public List<ObjectSummary> upload(String bucket, MultipartFile[] files) {
 
         if (files == null) {
             throw new ServerSideProblemException("multipart file array should not be null!");
         }
 
-        check();
+        check(bucket);
 
-        if (!doesBucketExists()) {
-            Bucket createdBucket = createBucket();
+        if (!doesBucketExists(bucket)) {
+            Bucket createdBucket = createBucket(bucket);
             if (createdBucket == null) {
                 throw new ServerSideProblemException(
                         String.format("Create bucket %s failed!", bucket == null ? "NULL" : bucket));
@@ -66,14 +59,14 @@ public class AWSS3ObjectManager implements ObjectManagementService {
 
             PutObjectResult result = null;
             try {
-                result = upload(file.getInputStream(), file.getOriginalFilename());
+                result = upload(bucket, file.getInputStream(), file.getOriginalFilename());
             } catch (IOException e) {
             }
 
             if (result != null) {
                 summaryList.add(new ObjectSummary()
                     .setFileName(file.getOriginalFilename())
-                    .setUrl(getUrl(file.getOriginalFilename())));
+                    .setUrl(getUrl(bucket, file.getOriginalFilename())));
             }
         }
 
@@ -81,15 +74,15 @@ public class AWSS3ObjectManager implements ObjectManagementService {
     }
 
     @Override
-    public byte[] download(String key) {
+    public byte[] download(String bucket, String key) {
 
         if (key == null) {
             throw new ServerSideProblemException("Download key should not be null!");
         }
 
-        check();
+        check(bucket);
 
-        if (!doesBucketExists()) {
+        if (!doesBucketExists(bucket)) {
             throw new ServerSideProblemException(
                     String.format("Bucket %s does not exist!", bucket == null ? "NULL" : bucket));
         }
@@ -113,11 +106,11 @@ public class AWSS3ObjectManager implements ObjectManagementService {
     }
 
     @Override
-    public List<ObjectSummary> list() {
+    public List<ObjectSummary> list(String bucket) {
 
-        check();
+        check(bucket);
 
-        if (!doesBucketExists()) {
+        if (!doesBucketExists(bucket)) {
             throw new ServerSideProblemException(
                     String.format("Bucket %s does not exist!", bucket == null ? "NULL" : bucket));
         }
@@ -136,21 +129,21 @@ public class AWSS3ObjectManager implements ObjectManagementService {
 
             summaryList.add(new ObjectSummary()
                     .setFileName(summary.getKey())
-                    .setUrl(getUrl(summary.getKey())));
+                    .setUrl(getUrl(bucket, summary.getKey())));
         }
         return summaryList;
     }
 
     @Override
-    public ObjectSummary delete(String key) {
+    public ObjectSummary delete(String bucket, String key) {
 
         if (key == null) {
             throw new ServerSideProblemException("Delete key should not be null!");
         }
 
-        check();
+        check(bucket);
 
-        if (!doesBucketExists()) {
+        if (!doesBucketExists(bucket)) {
             throw new ServerSideProblemException(
                     String.format("Bucket %s does not exist!", bucket == null ? "NULL" : bucket));
         }
@@ -162,10 +155,10 @@ public class AWSS3ObjectManager implements ObjectManagementService {
         } catch (Exception e) {
             return null;
         }
-        return new ObjectSummary().setFileName(key).setUrl(getUrl(key));
+        return new ObjectSummary().setFileName(key).setUrl(getUrl(bucket, key));
     }
 
-    private PutObjectResult upload(InputStream inputStream, String uploadKey) {
+    private PutObjectResult upload(String bucket, InputStream inputStream, String uploadKey) {
 
         if (inputStream == null || uploadKey == null) {
             return null;
@@ -182,7 +175,7 @@ public class AWSS3ObjectManager implements ObjectManagementService {
         return putObjectResult;
     }
 
-    private void check() throws ServerSideProblemException {
+    private void check(String bucket) throws ServerSideProblemException {
 
         if (bucket == null) {
             throw new ServerSideProblemException("bucket should not be null!");
@@ -192,7 +185,7 @@ public class AWSS3ObjectManager implements ObjectManagementService {
         }
     }
 
-    private String getUrl(String fileName) {
+    private String getUrl(String bucket, String fileName) {
 
         if (amazonS3Client == null || bucket == null) {
             return null;
@@ -201,7 +194,7 @@ public class AWSS3ObjectManager implements ObjectManagementService {
         return amazonS3Client.getResourceUrl(bucket, fileName);
     }
 
-    private boolean doesBucketExists() {
+    private boolean doesBucketExists(String bucket) {
 
         if (bucket == null) {
             return false;
@@ -210,7 +203,7 @@ public class AWSS3ObjectManager implements ObjectManagementService {
         return amazonS3Client.doesBucketExist(bucket);
     }
 
-    private Bucket createBucket() {
+    private Bucket createBucket(String bucket) {
         if (bucket == null) {
             return null;
         }

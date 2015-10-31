@@ -8,11 +8,11 @@ import com.echarm.apigateway.security.model.ObjectSummary;
 
 public interface ObjectManagementService {
 
-    public List<ObjectSummary> upload(MultipartFile[] files);
+    public List<ObjectSummary> upload(String directory, MultipartFile[] files);
 
-    public byte[] download(String key);
+    public byte[] download(String directory, String key);
 
-    public List<ObjectSummary> list();
+    public List<ObjectSummary> list(String directory);
 
-    public ObjectSummary delete(String key);
+    public ObjectSummary delete(String directory, String key);
 }
