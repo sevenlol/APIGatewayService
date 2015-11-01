@@ -158,6 +158,18 @@ public class AWSS3ObjectManager implements ObjectManagementService {
         return new ObjectSummary().setFileName(key).setUrl(getUrl(bucket, key));
     }
 
+    @Override
+    public String getKey(ObjectSummary summary) {
+
+        if (summary == null) {
+            return null;
+        }
+
+        return summary.getFileName() == null ?
+               summary.getFileName() :
+               getKey(summary.getUrl());
+    }
+
     private PutObjectResult upload(String bucket, InputStream inputStream, String uploadKey) {
 
         if (inputStream == null || uploadKey == null) {
@@ -185,6 +197,20 @@ public class AWSS3ObjectManager implements ObjectManagementService {
         }
     }
 
+    private String getKey(String url) {
+
+        if (url == null || !url.contains("/")) {
+            return null;
+        }
+
+        String[] tmp = url.split("/");
+        if (tmp != null && tmp.length > 0) {
+            return tmp[tmp.length - 1];
+        }
+
+        return null;
+    }
+
     private String getUrl(String bucket, String fileName) {
 
         if (amazonS3Client == null || bucket == null) {
@@ -210,4 +236,5 @@ public class AWSS3ObjectManager implements ObjectManagementService {
 
         return amazonS3Client.createBucket(bucket);
     }
+
 }

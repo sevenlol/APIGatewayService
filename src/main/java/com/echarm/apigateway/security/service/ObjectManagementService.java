@@ -15,4 +15,6 @@ public interface ObjectManagementService {
     public List<ObjectSummary> list(String directory);
 
     public ObjectSummary delete(String directory, String key);
+
+    public String getKey(ObjectSummary summary);
 }
