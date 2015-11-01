@@ -10,6 +10,8 @@ public interface ObjectManagementService {
 
     public List<ObjectSummary> upload(String directory, MultipartFile[] files);
 
+    public List<ObjectSummary> upload(String directory, MultipartFile[] files, String[] keys);
+
     public byte[] download(String directory, String key);
 
     public List<ObjectSummary> list(String directory);

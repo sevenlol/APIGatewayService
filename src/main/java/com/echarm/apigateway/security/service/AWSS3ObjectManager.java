@@ -74,6 +74,53 @@ public class AWSS3ObjectManager implements ObjectManagementService {
     }
 
     @Override
+    public List<ObjectSummary> upload(String bucket, MultipartFile[] files, String[] keys) {
+
+        if (files == null) {
+            throw new ServerSideProblemException("multipart file array should not be null!");
+        }
+        if (keys == null) {
+            throw new ServerSideProblemException("key array should not be null!");
+        }
+        if (keys.length != files.length) {
+            throw new ServerSideProblemException("key array and file array should have the same length!");
+        }
+
+        check(bucket);
+
+        if (!doesBucketExists(bucket)) {
+            Bucket createdBucket = createBucket(bucket);
+            if (createdBucket == null) {
+                throw new ServerSideProblemException(
+                        String.format("Create bucket %s failed!", bucket == null ? "NULL" : bucket));
+            }
+        }
+
+        List<ObjectSummary> summaryList = new ArrayList<ObjectSummary>();
+        for (int i = 0; i < files.length; i++) {
+            MultipartFile file = files[i];
+            String key = keys[i];
+            if (file == null || key == null) {
+                continue;
+            }
+
+            PutObjectResult result = null;
+            try {
+                result = upload(bucket, file.getInputStream(), key);
+            } catch (IOException e) {
+            }
+
+            if (result != null) {
+                summaryList.add(new ObjectSummary()
+                    .setFileName(file.getOriginalFilename())
+                    .setUrl(getUrl(bucket, file.getOriginalFilename())));
+            }
+        }
+
+        return summaryList;
+    }
+
+    @Override
     public byte[] download(String bucket, String key) {
 
         if (key == null) {
@@ -236,5 +283,4 @@ public class AWSS3ObjectManager implements ObjectManagementService {
 
         return amazonS3Client.createBucket(bucket);
     }
-
 }
