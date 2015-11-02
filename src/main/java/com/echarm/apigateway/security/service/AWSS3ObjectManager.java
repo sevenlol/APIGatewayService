@@ -2,6 +2,8 @@ package com.echarm.apigateway.security.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,8 +114,8 @@ public class AWSS3ObjectManager implements ObjectManagementService {
 
             if (result != null) {
                 summaryList.add(new ObjectSummary()
-                    .setFileName(file.getOriginalFilename())
-                    .setUrl(getUrl(bucket, file.getOriginalFilename())));
+                    .setFileName(key)
+                    .setUrl(getUrl(bucket, key)));
             }
         }
 
@@ -213,8 +215,8 @@ public class AWSS3ObjectManager implements ObjectManagementService {
         }
 
         return summary.getFileName() == null ?
-               summary.getFileName() :
-               getKey(summary.getUrl());
+               getKey(summary.getUrl()) :
+               summary.getFileName();
     }
 
     private PutObjectResult upload(String bucket, InputStream inputStream, String uploadKey) {
@@ -252,7 +254,11 @@ public class AWSS3ObjectManager implements ObjectManagementService {
 
         String[] tmp = url.split("/");
         if (tmp != null && tmp.length > 0) {
-            return tmp[tmp.length - 1];
+            try {
+                return URLDecoder.decode(tmp[tmp.length - 1], "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                return null;
+            }
         }
 
         return null;
