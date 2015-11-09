@@ -43,6 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	    /*
 	     * Authorization Config for Article System
 	     */
+        .and().authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 	    .and().authorizeRequests().antMatchers(HttpMethod.POST, "/accounts").permitAll()
         .and().authorizeRequests().antMatchers(HttpMethod.GET, "/articles", "/articles/*", "/articles/*/*").permitAll()
         .and().authorizeRequests().antMatchers(HttpMethod.POST, "/articles", "/articles/*", "/articles/*/*").hasRole("ADMIN")
@@ -98,6 +99,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
             .authorizeRequests().antMatchers(HttpMethod.DELETE, "/favorite/me/**").authenticated()
         .and()
             .authorizeRequests().antMatchers(HttpMethod.POST, "/me/reset_password").permitAll()
+        .and()
+            .authorizeRequests().antMatchers(HttpMethod.POST, "/me/stickers").authenticated()
         .and()
             .authorizeRequests().antMatchers(HttpMethod.PUT, "/me/**").authenticated()
 	    .and()
